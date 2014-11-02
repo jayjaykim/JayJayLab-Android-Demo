@@ -4,36 +4,27 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
+import com.jayjaylab.androiddemo.view.ImageViewThreadPool;
 
-public class ActivityMain extends ActionBarActivity {
+import roboguice.activity.RoboListActivity;
+import roboguice.activity.event.OnCreateEvent;
+import roboguice.activity.event.OnPauseEvent;
+import roboguice.event.Observes;
+import roboguice.inject.ContentView;
+import roboguice.util.Ln;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+@ContentView(R.layout.activity_main)
+public class ActivityMain extends RoboListActivity {
+    @Inject ImageViewThreadPool  imageViewThreadPool;
+
+    public void onCreateEvent(@Observes OnCreateEvent event) {
+
     }
 
+    public void onPauseEvent(@Observes OnPauseEvent event) {
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_activity_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
