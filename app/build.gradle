@@ -21,7 +21,7 @@ android {
 
     sourceSets {
         androidTest {
-            java.srcDirs = ['androidTest/java']
+            setRoot('src/androidTest');
         }
     }
 }
@@ -42,6 +42,9 @@ dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
 
 
+    repositories {
+        mavenCentral()
+    }
     androidTestCompile 'com.jakewharton.espresso:espresso:1.1-r3'
     androidTestCompile 'com.jakewharton.espresso:espresso-runner:1.1-r3'
     androidTestCompile 'com.jakewharton.espresso:espresso-runner-runtime:1.1-r3'
