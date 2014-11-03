@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'robolectric'
 
 android {
     compileSdkVersion 20
@@ -18,17 +19,20 @@ android {
         }
     }
 
-//    sourceSets {
-//        androidTest {
-//            java.srcDirs = ['androidTest/java']
-//        }
-//    }
+    sourceSets {
+        androidTest {
+            java.srcDirs = ['androidTest/java']
+        }
+    }
+}
+
+robolectric {
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
 }
 
 dependencies {
-//    compile project(':android-sdk')
     compile fileTree(dir: 'libs', include: ['*.jar'])
-//    compileTestCompile fileTree(dir: 'libs-tests', include: '*.jar')
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.android.support:support-v4:20.0.0'
     compile 'com.android.support:appcompat-v7:20.0.0'
@@ -36,5 +40,4 @@ dependencies {
     compile 'org.roboguice:roboguice:2.0'
     compile 'ch.acra:acra:4.5.0'
     compile 'com.nineoldandroids:library:2.4.0'
-//    testCompile 'org.mockito:mockito-all:1.10.8'
 }
