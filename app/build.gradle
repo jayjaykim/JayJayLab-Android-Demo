@@ -55,6 +55,7 @@ dependencies {
     androidTestCompile 'org.hamcrest:hamcrest-integration:1.1'
     androidTestCompile 'org.hamcrest:hamcrest-core:1.1'
     androidTestCompile 'org.hamcrest:hamcrest-library:1.1'
+    androidTestCompile "org.mockito:mockito-core:1.+"
 
     androidTestCompile('junit:junit:4.11') {
         exclude module: 'hamcrest-core'
