@@ -11,11 +11,11 @@ import java.lang.Exception;
 
 import static junit.framework.Assert.assertTrue;
 
-@Config(manifest = "./src/main/AndroidManifest.xml")
+@Config(manifest = "./app/src/main/AndroidManifest.xml")
 @RunWith(RobolectricTestRunner.class)
 public class ActivityIntroTest {
     @Test
-    public void testActivityIsNotNull() throws Exception {
+    public void testIfActivityIsNotNull() throws Exception {
         Activity activity = Robolectric.buildActivity(ActivityIntro.class).create().get();
         assertTrue(activity != null);
     }

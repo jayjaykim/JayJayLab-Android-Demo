@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android'
 apply plugin: 'robolectric'
 
 android {
@@ -11,6 +12,7 @@ android {
         targetSdkVersion 20
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
     }
     buildTypes {
         release {
@@ -49,6 +51,12 @@ dependencies {
 
     // Espresso
 //    androidTestCompile files('lib/espresso-1.1.jar', 'lib/testrunner-1.1.jar', 'lib/testrunner-runtime-1.1.jar')
+//    androidTestCompile fileTree(dir: 'libs', include: ['*.jar'])
+//    androidTestCompile 'com.google.code.gson:gson:2.3'
+//    androidTestCompile 'com.google.inject:guice:4.0-beta:no_aop'
+//    androidTestCompile 'org.roboguice:roboguice:2.0'
+//    androidTestCompile 'ch.acra:acra:4.5.0'
+//    androidTestCompile 'com.nineoldandroids:library:2.4.0'
     androidTestCompile 'com.jakewharton.espresso:espresso:1.1-r3'
     androidTestCompile 'com.jakewharton.espresso:espresso-runner:1.1-r3'
     androidTestCompile 'com.jakewharton.espresso:espresso-runner-runtime:1.1-r3'
