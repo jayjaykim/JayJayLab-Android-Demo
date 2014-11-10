@@ -10,8 +10,8 @@ import com.jayjaylab.androiddemo.R;
 import com.jayjaylab.androiddemo.view.ImageViewThreadPool;
 
 import roboguice.activity.RoboListActivity;
-import roboguice.activity.event.OnCreateEvent;
 import roboguice.activity.event.OnPauseEvent;
+import roboguice.context.event.OnCreateEvent;
 import roboguice.event.Observes;
 import roboguice.inject.ContentView;
 import roboguice.util.Ln;
