@@ -2,6 +2,7 @@ package com.jayjaylab.androiddemo;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -30,6 +31,8 @@ public class ActivityMain extends RoboActionBarActivity {
 
     public void onCreateEvent(@Observes OnCreateEvent event) {
         setSupportActionBar(toolbar);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
     }
 
     public void onPauseEvent(@Observes OnPauseEvent event) {

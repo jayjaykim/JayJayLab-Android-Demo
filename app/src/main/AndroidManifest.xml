@@ -18,7 +18,7 @@
         </activity>
         <activity
             android:name="com.jayjaylab.androiddemo.ActivityMain"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
         </activity>
     </application>
 
