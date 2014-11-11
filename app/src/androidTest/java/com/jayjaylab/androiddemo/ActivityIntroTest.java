@@ -2,6 +2,8 @@ package com.jayjaylab.androiddemo;
 
 import android.app.Activity;
 
+import com.jayjaylab.androiddemo.main.ActivityIntro;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,8 +12,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import java.lang.Exception;
-
-import roboguice.RoboGuice;
 
 import static junit.framework.Assert.assertTrue;
 

@@ -1,12 +1,11 @@
-package com.jayjaylab.androiddemo;
+package com.jayjaylab.androiddemo.main;
 
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.jayjaylab.androiddemo.R;
 import com.nineoldandroids.animation.ArgbEvaluator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.animation.ValueAnimator;

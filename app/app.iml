@@ -87,6 +87,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="espresso-1.1-r3" level="project" />
     <orderEntry type="library" exported="" name="roboguice-3.0" level="project" />
     <orderEntry type="library" exported="" name="acra-4.5.0" level="project" />
+    <orderEntry type="library" exported="" name="picasso-2.4.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-library-1.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="asm-commons-5.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="ant-launcher-1.8.0" level="project" />
