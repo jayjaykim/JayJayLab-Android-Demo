@@ -9,5 +9,6 @@
         android:minHeight="?attr/actionBarSize" android:background="?attr/colorPrimary" />
     <android.support.v7.widget.RecyclerView android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/grid_margin"/>
 </LinearLayout>

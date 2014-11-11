@@ -16,6 +16,8 @@ import com.jayjaylab.androiddemo.main.model.App;
 import java.util.ArrayList;
 import java.util.List;
 
+import roboguice.util.Ln;
+
 /**
  * Created by jongjoo on 11/11/14.
  */
@@ -27,12 +29,16 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Ln.i("onCreateViewHolder() : parent.h : " + parent.getHeight());
+
         View view = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.grid_item_mainapp, parent, false);
         ViewHolder vh = new ViewHolder(view);
         vh.imageThumbnail = (TintImageView)view.findViewById(R.id.image_thumbnail);
         vh.textTitle = (TextView)view.findViewById(R.id.text_title);
         vh.textDescription = (TextView)view.findViewById(R.id.text_description);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                parent.getHeight() / 2));
         return vh;
     }
 
