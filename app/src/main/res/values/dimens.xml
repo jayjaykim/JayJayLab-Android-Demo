@@ -3,6 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="cardview_radius">3dp</dimen>
     <dimen name="grid_horizontal_margin">5dp</dimen>
     <dimen name="grid_vertical_margin">5dp</dimen>
     <dimen name="grid_margin">5dp</dimen>

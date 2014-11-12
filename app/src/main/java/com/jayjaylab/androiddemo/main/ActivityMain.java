@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
@@ -55,6 +56,18 @@ public class ActivityMain extends RoboActionBarActivity {
         recyclerView.setLayoutManager(layoutManager);
         adapter.addItems(getApps());
         recyclerView.setAdapter(adapter);
+//        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+//            @Override
+//            public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent event) {
+//                Ln.d("onInterceptTouchEvent() : event : %s", event);
+//                return false;
+//            }
+//
+//            @Override
+//            public void onTouchEvent(RecyclerView recyclerView, MotionEvent event) {
+//                Ln.d("onTouchEvent() : event : %s", event);
+//            }
+//        });
     }
 
     protected List<App> getApps() {

@@ -3,4 +3,7 @@
     <item name="primary" type="color">#ff4682B4</item>
     <item name="primary_dark" type="color">#ff63B8FF</item>
     <item name="accent" type="color">#ff32CD32</item>
+
+    <item name="background_main_gridcell_unfocused" type="color">#00000000</item>
+    <item name="background_main_gridcell_focued" type="color">#88888888</item>
 </resources>
