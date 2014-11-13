@@ -1,36 +1,29 @@
-package com.jayjaylab.androiddemo.main;
+package com.jayjaylab.androiddemo.main.activity;
 
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
+import com.jayjaylab.androiddemo.main.adapter.AdapterMain;
 import com.jayjaylab.androiddemo.main.model.App;
-import com.jayjaylab.androiddemo.view.ImageViewThreadPool;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import roboguice.activity.RoboActionBarActivity;
-import roboguice.activity.RoboListActivity;
 import roboguice.activity.event.OnPauseEvent;
 import roboguice.context.event.OnCreateEvent;
 import roboguice.event.Observes;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
-import roboguice.util.Ln;
 
 @ContentView(R.layout.activity_main)
 public class ActivityMain extends RoboActionBarActivity {
 //    @Inject ImageViewThreadPool  imageViewThreadPool;
-    @Inject AdapterMain adapter;
+    @Inject
+AdapterMain adapter;
 
     // views
     @InjectView(R.id.toolbar) Toolbar toolbar;

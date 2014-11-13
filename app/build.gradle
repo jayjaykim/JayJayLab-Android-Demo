@@ -104,6 +104,9 @@ dependencies {
 
 apply plugin: 'idea'
 
+dependencies {
+    compile 'com.android.support:appcompat-v7:21.+'
+}
 idea {
     module {
         testOutputDir = file('build/test-classes/debug')

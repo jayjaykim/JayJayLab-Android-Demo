@@ -1,4 +1,4 @@
-package com.jayjaylab.androiddemo.main;
+package com.jayjaylab.androiddemo.main.activity;
 
 
 import android.content.Intent;

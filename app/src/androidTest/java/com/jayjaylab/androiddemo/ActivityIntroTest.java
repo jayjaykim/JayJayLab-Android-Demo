@@ -2,7 +2,7 @@ package com.jayjaylab.androiddemo;
 
 import android.app.Activity;
 
-import com.jayjaylab.androiddemo.main.ActivityIntro;
+import com.jayjaylab.androiddemo.main.activity.ActivityIntro;
 
 import org.junit.After;
 import org.junit.Before;
