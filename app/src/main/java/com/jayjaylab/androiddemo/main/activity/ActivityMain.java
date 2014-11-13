@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
@@ -37,6 +38,13 @@ public class ActivityMain extends RoboActionBarActivity {
         setViews();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_activity_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
     public void handleOnGridItemClickEvent(@Observes OnClickEvent event) {
         Ln.d("handleOnGridItemClickEvent() : event : %s", event);
         if(event != null) {
@@ -61,7 +69,13 @@ public class ActivityMain extends RoboActionBarActivity {
     }
 
     protected void setViews() {
+        setToolbar();
         setRecyclerView();
+    }
+
+    protected void setToolbar() {
+//        toolbar.inflateMenu(R.menu.menu_activity_main);
+        toolbar.setNavigationIcon(R.drawable.ic_launcher);
     }
 
     protected void setRecyclerView() {

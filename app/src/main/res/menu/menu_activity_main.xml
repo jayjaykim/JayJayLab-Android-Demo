@@ -2,6 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.jayjaylab.androiddemo.app.greyhound.activity.ActivityMain">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/menu_overflow" android:title="@string/more"
+        android:icon="@drawable/overflow_icon"
+        android:orderInCategory="100" app:showAsAction="always">
+        <menu>
+            <item android:id="@+id/menu_license" app:showAsAction="never"
+                android:title="@string/opensource_license"/>
+        </menu>
+    </item>
 </menu>
