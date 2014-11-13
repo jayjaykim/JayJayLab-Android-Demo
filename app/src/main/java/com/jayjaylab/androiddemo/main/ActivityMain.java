@@ -72,8 +72,9 @@ public class ActivityMain extends RoboActionBarActivity {
 
     protected List<App> getApps() {
         List<App> apps = new ArrayList<App>(10);
-        apps.add(new App(null, "GreyHound", "This native app records your walking path"));
+        apps.add(new App(null, "Grey Hound", "This native app records your walking path"));
         apps.add(new App(null, "Collie", "This webapp offers new mobile shopping experiences"));
+        apps.add(new App(null, "Wild Dog", "This webapp provides hotels, inns info for people to stay"));
 
         return apps;
     }
