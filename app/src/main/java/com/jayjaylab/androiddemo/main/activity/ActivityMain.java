@@ -1,11 +1,13 @@
 package com.jayjaylab.androiddemo.main.activity;
 
+import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
+import com.jayjaylab.androiddemo.event.OnClickEvent;
 import com.jayjaylab.androiddemo.main.adapter.AdapterMain;
 import com.jayjaylab.androiddemo.main.model.App;
 
@@ -18,12 +20,12 @@ import roboguice.context.event.OnCreateEvent;
 import roboguice.event.Observes;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import roboguice.util.Ln;
 
 @ContentView(R.layout.activity_main)
 public class ActivityMain extends RoboActionBarActivity {
 //    @Inject ImageViewThreadPool  imageViewThreadPool;
-    @Inject
-AdapterMain adapter;
+    @Inject AdapterMain adapter;
 
     // views
     @InjectView(R.id.toolbar) Toolbar toolbar;
@@ -33,6 +35,25 @@ AdapterMain adapter;
         setSupportActionBar(toolbar);
 
         setViews();
+    }
+
+    public void handleOnGridItemClickEvent(@Observes OnClickEvent event) {
+        Ln.d("handleOnGridItemClickEvent() : event : %s", event);
+        if(event != null) {
+            Intent intent = null;
+
+            switch(event.getWhich()) {
+                case 0:
+                    intent = new Intent(this, com.jayjaylab.androiddemo.app.greyhound.
+                            activity.ActivityMain.class);
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+            startActivity(intent);
+        }
     }
 
     public void onPauseEvent(@Observes OnPauseEvent event) {
@@ -49,18 +70,6 @@ AdapterMain adapter;
         recyclerView.setLayoutManager(layoutManager);
         adapter.addItems(getApps());
         recyclerView.setAdapter(adapter);
-//        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-//            @Override
-//            public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent event) {
-//                Ln.d("onInterceptTouchEvent() : event : %s", event);
-//                return false;
-//            }
-//
-//            @Override
-//            public void onTouchEvent(RecyclerView recyclerView, MotionEvent event) {
-//                Ln.d("onTouchEvent() : event : %s", event);
-//            }
-//        });
     }
 
     protected List<App> getApps() {

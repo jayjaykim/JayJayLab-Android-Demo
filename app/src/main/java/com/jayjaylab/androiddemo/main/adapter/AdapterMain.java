@@ -11,18 +11,21 @@ import android.widget.TextView;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.jayjaylab.androiddemo.R;
+import com.jayjaylab.androiddemo.event.OnClickEvent;
 import com.jayjaylab.androiddemo.main.model.App;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import roboguice.event.EventManager;
 import roboguice.util.Ln;
 
 /**
  * Created by jongjoo on 11/11/14.
  */
 public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
-    protected List<App> items = new ArrayList<App>(10);
+    List<App> items = new ArrayList<App>(10);
+    @Inject EventManager eventManager;
 
     @Inject
     public AdapterMain(Provider<Context> context) {}
@@ -44,7 +47,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         final App app = items.get(position);
         if(app != null) {
             // TODO sets thumbnail
@@ -56,21 +59,12 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     Ln.d("onClick() : v : %s", v);
                 }
             });
-//            viewHolder.layout.setOnTouchListener(new View.OnTouchListener() {
-//                @Override
-//                public boolean onTouch(View v, MotionEvent event) {
-//                    Ln.d("onTouch() : event : %s", event);
-//
-//                    final int action = event.getAction();
-//                    if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP ||
-//                            action == MotionEvent.ACTION_MOVE) {
-//                        viewHolder.itemView.setBackgroundResource(R.color.background_main_gridcell_unfocused);
-//                    } else if (action == MotionEvent.ACTION_DOWN) {
-//                        viewHolder.itemView.setBackgroundResource(R.color.background_main_gridcell_focued);
-//                    }
-//                    return false;
-//                }
-//            });
+            viewHolder.layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    eventManager.fire(new OnClickEvent(viewHolder.layout, position));
+                }
+            });
         }
     }
 
