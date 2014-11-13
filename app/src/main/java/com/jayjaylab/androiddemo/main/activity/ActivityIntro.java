@@ -30,14 +30,14 @@ public class ActivityIntro extends RoboSplashActivity {
     }
 
     private void setTextCompany() {
-        TextView text = (TextView)findViewById(R.id.text_company);
-
-        ValueAnimator colorAnim = ObjectAnimator.ofInt(text, "textColor", RED, BLUE);
-        colorAnim.setDuration(1000);
-        colorAnim.setEvaluator(new ArgbEvaluator());
-        colorAnim.setRepeatCount(ValueAnimator.INFINITE);
-        colorAnim.setRepeatMode(ValueAnimator.REVERSE);
-        colorAnim.start();
+//        TextView text = (TextView)findViewById(R.id.text_company);
+//
+//        ValueAnimator colorAnim = ObjectAnimator.ofInt(text, "textColor", RED, BLUE);
+//        colorAnim.setDuration(1000);
+//        colorAnim.setEvaluator(new ArgbEvaluator());
+//        colorAnim.setRepeatCount(ValueAnimator.INFINITE);
+//        colorAnim.setRepeatMode(ValueAnimator.REVERSE);
+//        colorAnim.start();
     }
 
     @Override
