@@ -28,7 +28,7 @@
         </activity>
         <activity
             android:name=".app.greyhound.activity.ActivityMain"
-            android:label="@string/title_activity_activity_main"
+            android:label="@string/grey_hound"
             android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".main.activity.ActivityMain" >

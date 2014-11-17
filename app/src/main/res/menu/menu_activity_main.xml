@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.jayjaylab.androiddemo.app.greyhound.activity.ActivityMain">
+    tools:context="com.jayjaylab.androiddemo.main.activity.ActivityMain">
     <item android:id="@+id/menu_overflow" android:title="@string/more"
         android:icon="@drawable/overflow_icon"
         android:orderInCategory="100" app:showAsAction="always">

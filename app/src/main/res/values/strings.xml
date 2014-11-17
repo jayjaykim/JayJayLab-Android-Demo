@@ -9,4 +9,7 @@
     <string name="title_activity_activity_main">ActivityMain</string>
     <string name="more">more</string>
     <string name="opensource_license">OpenSource License</string>
+    <string name="grey_hound">Grey Hound</string>
+    <string name="collie">Collie</string>
+    <string name="wild_dog">Wild Dog</string>
 </resources>
