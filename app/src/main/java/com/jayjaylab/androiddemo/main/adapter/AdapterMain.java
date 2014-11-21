@@ -41,8 +41,8 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         vh.imageThumbnail = (TintImageView)view.findViewById(R.id.image_thumbnail);
         vh.textTitle = (TextView)view.findViewById(R.id.text_title);
         vh.textDescription = (TextView)view.findViewById(R.id.text_description);
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                parent.getHeight() / 2));
+//        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+//                parent.getHeight() / 2));
         return vh;
     }
 

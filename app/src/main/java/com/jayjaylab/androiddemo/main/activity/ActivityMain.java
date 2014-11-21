@@ -3,6 +3,7 @@ package com.jayjaylab.androiddemo.main.activity;
 import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 
@@ -20,6 +21,7 @@ import roboguice.activity.event.OnPauseEvent;
 import roboguice.context.event.OnCreateEvent;
 import roboguice.event.Observes;
 import roboguice.inject.ContentView;
+import roboguice.inject.InjectResource;
 import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
@@ -27,6 +29,10 @@ import roboguice.util.Ln;
 public class ActivityMain extends RoboActionBarActivity {
 //    @Inject ImageViewThreadPool  imageViewThreadPool;
     @Inject AdapterMain adapter;
+
+    @InjectResource(R.string.app_description_greyhound) String appDescriptionGreyHound;
+    @InjectResource(R.string.app_description_collie) String appDescriptionCollie;
+    @InjectResource(R.string.app_description_wilddog) String appDescriptionWildDog;
 
     // views
     @InjectView(R.id.toolbar) Toolbar toolbar;
@@ -79,8 +85,8 @@ public class ActivityMain extends RoboActionBarActivity {
     }
 
     protected void setRecyclerView() {
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2,
-                GridLayoutManager.VERTICAL, false);
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2,
+                StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         adapter.addItems(getApps());
         recyclerView.setAdapter(adapter);
@@ -88,9 +94,9 @@ public class ActivityMain extends RoboActionBarActivity {
 
     protected List<App> getApps() {
         List<App> apps = new ArrayList<App>(10);
-        apps.add(new App(null, "Grey Hound", "This native app records your walking path"));
-        apps.add(new App(null, "Collie", "This webapp offers new mobile shopping experiences"));
-        apps.add(new App(null, "Wild Dog", "This webapp provides hotels, inns info for people to stay"));
+        apps.add(new App(null, "Grey Hound", appDescriptionGreyHound));
+        apps.add(new App(null, "Collie", appDescriptionCollie));
+        apps.add(new App(null, "Wild Dog", appDescriptionWildDog));
 
         return apps;
     }
