@@ -7,7 +7,7 @@
     tools:context="com.jayjaylab.androiddemo.app.greyhound.activity.ActivityMain">
     <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize" android:background="?attr/colorPrimary" />
+        android:minHeight="?attr/actionBarSize" />
     <RelativeLayout android:id="@+id/layout_bottom"
         android:layout_width="match_parent"
         android:layout_height="80dp" android:background="#ff000000"
