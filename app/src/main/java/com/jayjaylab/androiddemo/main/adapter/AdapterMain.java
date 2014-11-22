@@ -35,7 +35,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         Ln.i("onCreateViewHolder() : parent.h : " + parent.getHeight());
 
         View view = LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.grid_item_mainapp, parent, false);
+                R.layout.recyclerview_item_mainapp, parent, false);
         ViewHolder vh = new ViewHolder(view);
         vh.layout = view.findViewById(R.id.layout);
         vh.imageThumbnail = (TintImageView)view.findViewById(R.id.image_thumbnail);

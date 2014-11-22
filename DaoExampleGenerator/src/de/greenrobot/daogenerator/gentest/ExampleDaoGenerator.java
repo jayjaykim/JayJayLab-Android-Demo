@@ -31,17 +31,31 @@ import de.greenrobot.daogenerator.ToMany;
 public class ExampleDaoGenerator {
 
     public static void main(String[] args) throws Exception {
-        Schema schema = new Schema(1000, "de.greenrobot.daoexample");
+        Schema schema = new Schema(1, "com.jayjaylab.androiddemo");
 
-        addNote(schema);
-        addCustomerOrder(schema);
+        addPath(schema);
+//        addNote(schema);
+//        addCustomerOrder(schema);
 
         new DaoGenerator().generateAll(schema, "../app/src/main/java-gen");
     }
 
+    static void addPath(Schema schema) {
+        // index int pk, nn, ai
+        // gpx mediumtext nn
+        // start_time datetime
+        // end_time datetime
+        Entity path = schema.addEntity("Path");
+        path.setTableName("path");
+        path.addIdProperty().notNull();
+        path.addStringProperty("gpxPath").notNull();
+        path.addStringProperty("startTime").notNull();
+        path.addStringProperty("endTime").notNull();
+    }
+
     private static void addNote(Schema schema) {
         Entity note = schema.addEntity("Note");
-        note.addIdProperty();
+        note.addIdProperty().primaryKeyAsc().notNull().autoincrement().index();
         note.addStringProperty("text").notNull();
         note.addStringProperty("comment");
         note.addDateProperty("date");
