@@ -50,6 +50,10 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         notifyDataSetChanged();
     }
 
+    public Path getItem(int position) {
+        return items.get(position);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textviewDateTime;
         public TextView textviewPathInfo;

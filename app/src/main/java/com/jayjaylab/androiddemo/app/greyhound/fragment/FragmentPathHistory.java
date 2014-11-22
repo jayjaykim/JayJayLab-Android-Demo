@@ -77,9 +77,9 @@ public class FragmentPathHistory extends RoboFragment {
                     orderDesc(PathDao.Properties.Id).
                     limit(HISTORY_ROW_NUM_LIMIT).list();
             Ln.d("loadTenPaths() : paths : %s, # paths : %d", pathList, pathList.size());
-
+            adapter.addItems(pathList);
         } else {
-            // TODO lodas the paths which is smaller than the fromIndex
+            // TODO loads the paths which is smaller than the fromIndex
         }
     }
 

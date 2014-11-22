@@ -1,6 +1,8 @@
 package com.jayjaylab.androiddemo.main.activity;
 
 import android.content.Intent;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -56,6 +58,13 @@ public class ActivityMain extends RoboActionBarActivity {
         if(event != null) {
             Intent intent = null;
 
+//            ActivityOptionsCompat options =
+//                    ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                            activity, transitionView, EXTRA_IMAGE);
+//            Intent intent = new Intent(activity, DetailActivity.class);
+//            intent.putExtra(EXTRA_IMAGE, url);
+//            ActivityCompat.startActivity(activity, intent, options.toBundle());
+
             switch(event.getWhich()) {
                 case 0:
                     intent = new Intent(this, com.jayjaylab.androiddemo.app.greyhound.
@@ -81,7 +90,7 @@ public class ActivityMain extends RoboActionBarActivity {
 
     protected void setToolbar() {
 //        toolbar.inflateMenu(R.menu.menu_activity_main);
-        toolbar.setNavigationIcon(R.drawable.ic_launcher);
+        toolbar.setLogo(R.drawable.ic_launcher);
     }
 
     protected void setRecyclerView() {

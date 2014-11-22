@@ -34,7 +34,7 @@
             android:parentActivityName=".main.activity.ActivityMain" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.jayjaylab.androiddemo.main.ActivityMain" />
+                android:value="com.jayjaylab.androiddemo.main.activity.ActivityMain" />
         </activity>
     </application>
 
