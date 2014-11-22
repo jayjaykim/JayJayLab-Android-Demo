@@ -3,6 +3,7 @@ package com.jayjaylab.androiddemo.app.greyhound.activity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.internal.widget.TintImageView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,9 +24,18 @@ public class ActivityMain extends RoboActionBarActivity {
     @Inject FragmentPathHistory fragmentPathHistory;
     // views
     @InjectView(R.id.toolbar) Toolbar toolbar;
+    @InjectView(R.id.imageview_recordpause) TintImageView imageviewRecordPause;
+    @InjectView(R.id.imageview_stop) TintImageView imageviewStop;
 
     public void onCreateEvent(@Observes OnCreateEvent event) {
         setSupportActionBar(toolbar);
+        loadPathHistoryFragment();
+
+        setViews();
+    }
+
+    protected void setViews() {
+
     }
 
     protected void loadPathHistoryFragment() {
