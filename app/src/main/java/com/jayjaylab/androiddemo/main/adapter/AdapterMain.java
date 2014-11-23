@@ -13,6 +13,7 @@ import com.google.inject.Provider;
 import com.jayjaylab.androiddemo.R;
 import com.jayjaylab.androiddemo.event.OnClickEvent;
 import com.jayjaylab.androiddemo.main.model.App;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +26,8 @@ import roboguice.util.Ln;
  */
 public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     List<App> items = new ArrayList<App>(10);
+    @Inject Context context;
     @Inject EventManager eventManager;
-
-    @Inject
-    public AdapterMain(Provider<Context> context) {}
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -50,15 +49,25 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         final App app = items.get(position);
         if(app != null) {
-            // TODO sets thumbnail
+            try {
+                if (app.getThumbnailResId() != 0) {
+                    Picasso.with(context).load(app.getThumbnailResId()).
+                            into(viewHolder.imageThumbnail);
+                } else if (app.getThumbnailUri() != null) {
+                    Picasso.with(context).load(app.getThumbnailUri()).
+                            into(viewHolder.imageThumbnail);
+                }
+            } catch(Exception e) {
+                Ln.e(e);
+            }
             viewHolder.textTitle.setText(app.getTitle());
             viewHolder.textDescription.setText(app.getDescription());
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Ln.d("onClick() : v : %s", v);
-                }
-            });
+//            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Ln.d("onClick() : v : %s", v);
+//                }
+//            });
             viewHolder.layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

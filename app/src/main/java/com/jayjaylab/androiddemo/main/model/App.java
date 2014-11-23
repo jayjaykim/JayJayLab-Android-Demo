@@ -4,22 +4,32 @@ package com.jayjaylab.androiddemo.main.model;
  * Created by jongjoo on 11/11/14.
  */
 public class App {
-    String uri;
+    String thumbnailUri;
+    int thumbnailResId;
     String title;
     String description;
 
-    public App(String uri, String title, String description) {
-        this.uri = uri;
+    public App(String uri, int thumbnailResId, String title, String description) {
+        this.thumbnailUri = uri;
+        this.thumbnailResId = thumbnailResId;
         this.title = title;
         this.description = description;
     }
 
-    public String getUri() {
-        return uri;
+    public int getThumbnailResId() {
+        return thumbnailResId;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setThumbnailResId(int thumbnailResId) {
+        this.thumbnailResId = thumbnailResId;
+    }
+
+    public String getThumbnailUri() {
+        return thumbnailUri;
+    }
+
+    public void setThumbnailUri(String thumbnailUri) {
+        this.thumbnailUri = thumbnailUri;
     }
 
     public String getTitle() {
@@ -40,7 +50,7 @@ public class App {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("uri : " + uri);
+        builder.append("thumbnailUri : " + thumbnailUri);
         builder.append(", title : " + title);
         builder.append(", description : " + description);
         return builder.toString();

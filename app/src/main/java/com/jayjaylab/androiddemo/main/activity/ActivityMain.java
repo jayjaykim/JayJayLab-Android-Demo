@@ -103,9 +103,9 @@ public class ActivityMain extends RoboActionBarActivity {
 
     protected List<App> getApps() {
         List<App> apps = new ArrayList<App>(10);
-        apps.add(new App(null, "Grey Hound", appDescriptionGreyHound));
-        apps.add(new App(null, "Collie", appDescriptionCollie));
-        apps.add(new App(null, "Wild Dog", appDescriptionWildDog));
+        apps.add(new App(null, 0, "Grey Hound", appDescriptionGreyHound));
+        apps.add(new App(null, R.drawable.waiting, "Collie", appDescriptionCollie));
+        apps.add(new App(null, R.drawable.waiting, "Wild Dog", appDescriptionWildDog));
 
         return apps;
     }
