@@ -70,9 +70,7 @@ public class FragmentPathHistory extends RoboFragment {
      */
     public void loadTenPaths(int fromIndex) {
         if(fromIndex < 0) {
-            // TODO loads the recent ten paths
-            // select price from mobile_sales_details order by price desc limit 5
-
+            // loads the recent ten paths
             List<Path> pathList = pathDao.queryBuilder().
                     orderDesc(PathDao.Properties.Id).
                     limit(HISTORY_ROW_NUM_LIMIT).list();
