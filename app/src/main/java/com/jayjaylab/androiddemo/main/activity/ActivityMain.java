@@ -32,6 +32,9 @@ public class ActivityMain extends RoboActionBarActivity {
 //    @Inject ImageViewThreadPool  imageViewThreadPool;
     @Inject AdapterMain adapter;
 
+    @InjectResource(R.string.app_title_grey_hound) String appTitleGreyHound;
+    @InjectResource(R.string.app_title_collie) String appTitleCollie;
+    @InjectResource(R.string.app_title_wild_dog) String appTitleWildDog;
     @InjectResource(R.string.app_description_greyhound) String appDescriptionGreyHound;
     @InjectResource(R.string.app_description_collie) String appDescriptionCollie;
     @InjectResource(R.string.app_description_wilddog) String appDescriptionWildDog;
@@ -103,9 +106,9 @@ public class ActivityMain extends RoboActionBarActivity {
 
     protected List<App> getApps() {
         List<App> apps = new ArrayList<App>(10);
-        apps.add(new App(null, 0, "Grey Hound", appDescriptionGreyHound));
-        apps.add(new App(null, R.drawable.waiting, "Collie", appDescriptionCollie));
-        apps.add(new App(null, R.drawable.waiting, "Wild Dog", appDescriptionWildDog));
+        apps.add(new App(null, 0, appTitleGreyHound, appDescriptionGreyHound));
+        apps.add(new App(null, R.drawable.waiting, appTitleCollie, appDescriptionCollie));
+        apps.add(new App(null, R.drawable.waiting, appTitleWildDog, appDescriptionWildDog));
 
         return apps;
     }

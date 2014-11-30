@@ -203,6 +203,22 @@ public class ActivityMain extends RoboActionBarActivity {
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             Ln.d("onReceiveResult() : resultCode : %d, resultData : %s", resultCode, resultData);
+            switch(resultCode) {
+                case Constants.MSG_ONFINISH_START_RECORDING:
+                    if(resultData == null) {
+
+                    } else {
+                        // TODO displays error message
+                        Ln.e("cannot open file due to not enough space");
+                    }
+                    break;
+                case Constants.MSG_ONFINISH_PAUSE_RECORDING:
+                    break;
+                case Constants.MSG_ONFINISH_STOP_RECORDING:
+                    break;
+                case Constants.MSG_NO_GOOGLE_SERVICE:
+                    break;
+            }
 
             super.onReceiveResult(resultCode, resultData);
         }

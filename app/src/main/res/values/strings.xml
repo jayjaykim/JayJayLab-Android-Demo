@@ -6,15 +6,17 @@
     <string name="app_description_greyhound">This native app records your walking path and shows your walking history</string>
     <string name="app_description_collie">This webapp offers new mobile shopping experiences to people</string>
     <string name="app_description_wilddog">This webapp provides hotels, inns info for people to stay and finally be able to book</string>
+    <!-- App Titles -->
+    <string name="app_title_grey_hound">Grey Hound</string>
+    <string name="app_title_collie">Collie</string>
+    <string name="app_title_wild_dog">Wild Dog</string>
+
+    <string name="more">more</string>
+    <string name="opensource_license">OpenSource License</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_activity_intro">ActivityIntro</string>
     <string name="crash_toast_text">Crush occurs.\nPlease notify the crash.</string>
     <string name="title_activity_activity_main">ActivityMain</string>
-    <string name="more">more</string>
-    <string name="opensource_license">OpenSource License</string>
-    <string name="grey_hound">Grey Hound</string>
-    <string name="collie">Collie</string>
-    <string name="wild_dog">Wild Dog</string>
 </resources>

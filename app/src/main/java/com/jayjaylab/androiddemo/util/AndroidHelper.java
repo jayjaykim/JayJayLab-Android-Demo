@@ -2,7 +2,9 @@ package com.jayjaylab.androiddemo.util;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.os.Environment;
 
+import java.io.File;
 import java.lang.reflect.Field;
 
 /**
@@ -34,5 +36,40 @@ public class AndroidHelper {
         }
 
         return false;
+    }
+
+    /* Checks if external storage is available for read and write */
+    public static boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public static boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static long getFreeSpace(String path) {
+        File file = new File(path);
+        if(!(file.isDirectory() && file.exists())) {
+            file.mkdirs();
+            if(file.isDirectory()) {
+                return file.getFreeSpace();
+            } else {
+                return 0L;
+            }
+        } else {
+            return file.getFreeSpace();
+        }
     }
 }

@@ -3,44 +3,132 @@ package com.jayjaylab.androiddemo.app.greyhound.service;
 import android.app.Dialog;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.res.Configuration;
+import android.location.Location;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.ResultReceiver;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.ErrorDialogFragment;
+import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
 import com.jayjaylab.androiddemo.app.greyhound.util.Constants;
+import com.jayjaylab.androiddemo.app.greyhound.util.GPXWriter;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import roboguice.service.RoboService;
 import roboguice.util.Ln;
 
-public class ServiceRecordingPath extends RoboService {
-
+public class ServiceRecordingPath extends RoboService implements
+    GooglePlayServicesClient.ConnectionCallbacks,
+    GooglePlayServicesClient.OnConnectionFailedListener,
+    LocationListener {
+    final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    // Milliseconds per second
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+    // Update frequency in seconds
+    public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+    // Update frequency in milliseconds
+    private static final long UPDATE_INTERVAL =
+            MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
+    // The fastest update frequency, in seconds
+    private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
+    // A fast frequency ceiling in milliseconds
+    private static final long FASTEST_INTERVAL =
+            MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
     final Messenger messenger = new Messenger(new IncomingHandler());
+    final String GPX_FILE_EXTENSION = ".gpx";
+    String DIR_PATH;
+
+    boolean isLocationServiceConnected;
+
+
     ResultReceiver resultReceiver;
+    LocationClient locationClient;
+    LocationRequest locationRequest;
+
+    @Inject GPXWriter gpxWriter;
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Ln.d("onConnected() : bundle : %s", bundle);
+        isLocationServiceConnected = true;
+    }
+
+    @Override
+    public void onDisconnected() {
+        Ln.d("onDisconnected()");
+        isLocationServiceConnected = false;
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Ln.d("onConnectionFailed() : connectionResult() : %s", connectionResult);
+        isLocationServiceConnected = false;
+//        if (connectionResult.hasResolution()) {
+//            try {
+//                // Start an Activity that tries to resolve the error
+//                connectionResult.startResolutionForResult(
+//                        this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
+//            } catch (IntentSender.SendIntentException e) {
+//                Ln.e(e);
+//            }
+//        } else {
+//        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Ln.d("onLocationChanged() : location : %s", location);
+        gpxWriter.write(location);
+    }
 
     @Override
     public void onCreate() {
         Ln.d("onCreate()");
+
+        File[] files = ContextCompat.getExternalFilesDirs(this, null);
+        DIR_PATH = files[0].getAbsolutePath();
+
+//        recordingState = RECORDING_STATE.IDLE;
+        setLocationRequest();
+        locationClient = new LocationClient(this, this, this);
+        locationClient.connect();
+
         super.onCreate();
+    }
+
+    protected void setLocationRequest() {
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(FASTEST_INTERVAL);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Ln.d("onStartCommand()");
-        resultReceiver = intent.getParcelableExtra("receiver");
-
-        if(!servicesConnected()) {
-            resultReceiver.send(Constants.MSG_NO_GOOGLE_SERVICE, null);
-            stopSelf();
+        if(intent != null) {
+            resultReceiver = intent.getParcelableExtra("receiver");
         }
 
+        checkPrecondition();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -64,6 +152,14 @@ public class ServiceRecordingPath extends RoboService {
         return messenger.getBinder();
     }
 
+    protected void checkPrecondition() {
+        if(!servicesConnected()) {
+            if(resultReceiver != null)
+                resultReceiver.send(Constants.MSG_NO_GOOGLE_SERVICE, null);
+            stopSelf();
+        }
+    }
+
     /**
      * Verify that Google Play services is available before making a request.
      *
@@ -83,6 +179,43 @@ public class ServiceRecordingPath extends RoboService {
         }
     }
 
+    protected String getFileName() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
+
+    protected void startRecording() {
+        Ln.d("startRecording()");
+
+        if(gpxWriter.isFileClosed()) {
+            boolean opened = gpxWriter.openFile(DIR_PATH, getFileName() + GPX_FILE_EXTENSION);
+            if(!opened) {
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("result", false);
+                resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, bundle);
+                return;
+            }
+        }
+        locationClient.requestLocationUpdates(locationRequest, ServiceRecordingPath.this);
+        resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, null);
+    }
+
+    protected void pauseRecording() {
+        Ln.d("pauseRecording()");
+
+        locationClient.removeLocationUpdates(ServiceRecordingPath.this);
+        resultReceiver.send(Constants.MSG_ONFINISH_PAUSE_RECORDING, null);
+    }
+
+    protected void stopRecording() {
+        Ln.d("stopRecording()");
+
+        gpxWriter.closeFile();
+        locationClient.removeLocationUpdates(ServiceRecordingPath.this);
+        resultReceiver.send(Constants.MSG_ONFINISH_STOP_RECORDING, null);
+    }
+
     protected class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -90,13 +223,13 @@ public class ServiceRecordingPath extends RoboService {
 
             switch(msg.what) {
                 case Constants.MSG_START_RECORDING:
-                    resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, null);
+                    startRecording();
                     break;
                 case Constants.MSG_PAUSE_RECORDING:
-                    resultReceiver.send(Constants.MSG_ONFINISH_PAUSE_RECORDING, null);
+                    pauseRecording();
                     break;
                 case Constants.MSG_STOP_RECORDING:
-                    resultReceiver.send(Constants.MSG_ONFINISH_STOP_RECORDING, null);
+                    stopRecording();
                     stopSelf();
                     break;
                 default:

@@ -3,6 +3,8 @@
     package="com.jayjaylab.androiddemo" >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18"/>
 
     <application
         android:name="com.jayjaylab.androiddemo.Application"
@@ -31,7 +33,7 @@
         <activity
             android:name="com.jayjaylab.androiddemo.app.greyhound.activity.ActivityMain"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/grey_hound"
+            android:label="@string/app_title_grey_hound"
             android:parentActivityName="com.jayjaylab.androiddemo.main.activity.ActivityMain"
             android:screenOrientation="portrait" >
             <meta-data
