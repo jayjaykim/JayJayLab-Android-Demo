@@ -81,11 +81,11 @@ public class ActivityMain extends RoboActionBarActivity {
             public void onClick(View v) {
                 if(isPaused) {
                     isPaused = false;
-                    imagebuttonRecordPause.setImageResource(R.drawable.record);
+                    imagebuttonRecordPause.setImageResource(R.drawable.pause);
                     startRecording();
                 } else {
                     isPaused = true;
-                    imagebuttonRecordPause.setImageResource(R.drawable.pause);
+                    imagebuttonRecordPause.setImageResource(R.drawable.record);
                     pauseRecording();
                 }
             }
@@ -166,7 +166,15 @@ public class ActivityMain extends RoboActionBarActivity {
     protected void bindServiceIfNeed() {
         if(!isBound) {
             Intent intent = new Intent(this, ServiceRecordingPath.class);
+            intent.putExtra("receiver", resultReceiver);
             bindService(intent, connection, 0);
+        }
+    }
+
+    protected void unbindServiceIfNeed() {
+        if(isBound) {
+            unbindService(connection);
+            isBound = false;
         }
     }
 
@@ -215,6 +223,7 @@ public class ActivityMain extends RoboActionBarActivity {
                 case Constants.MSG_ONFINISH_PAUSE_RECORDING:
                     break;
                 case Constants.MSG_ONFINISH_STOP_RECORDING:
+                    unbindServiceIfNeed();
                     break;
                 case Constants.MSG_NO_GOOGLE_SERVICE:
                     break;

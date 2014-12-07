@@ -21,13 +21,13 @@
                 android:src="@drawable/stop"
                 android:background="@drawable/selector_circlebutton_greyhound"
                 android:scaleType="centerInside" android:layout_gravity="center"
-                android:layout_marginRight="5dp"/>
+                android:layout_marginRight="5dp" android:elevation="8dp"/>
             <ImageButton android:id="@+id/imagebutton_recordpause"
                 android:layout_width="60dp" android:layout_height="60dp"
                 android:src="@drawable/record"
                 android:background="@drawable/selector_circlebutton_greyhound"
                 android:scaleType="centerInside" android:layout_gravity="center"
-                android:layout_marginLeft="5dp"/>
+                android:layout_marginLeft="5dp" android:elevation="8dp"/>
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent"
             android:layout_height="match_parent" android:layout_alignParentLeft="true"

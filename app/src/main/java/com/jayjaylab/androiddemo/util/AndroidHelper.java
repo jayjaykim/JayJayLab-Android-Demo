@@ -59,6 +59,11 @@ public class AndroidHelper {
         return false;
     }
 
+    public static boolean makeDirectory(String dirPath) {
+        File file = new File(dirPath);
+        return file.mkdirs() || file.isDirectory();
+    }
+
     public static long getFreeSpace(String path) {
         File file = new File(path);
         if(!(file.isDirectory() && file.exists())) {

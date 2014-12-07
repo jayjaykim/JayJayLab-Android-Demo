@@ -8,9 +8,9 @@
         <option name="gradleHome" value="$APPLICATION_HOME_DIR$/gradle/gradle-2.2.1" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/DaoExampleGenerator" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="$USER_HOME$/development/jayjaylab/JayJayLab-Android-Demo" />
+            <option value="$USER_HOME$/development/jayjaylab/JayJayLab-Android-Demo/DaoExampleGenerator" />
+            <option value="$USER_HOME$/development/jayjaylab/JayJayLab-Android-Demo/app" />
           </set>
         </option>
       </GradleProjectSettings>

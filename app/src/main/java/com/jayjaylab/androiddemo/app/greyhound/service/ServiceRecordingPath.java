@@ -7,6 +7,7 @@ import android.content.IntentSender;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -26,6 +27,7 @@ import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
 import com.jayjaylab.androiddemo.app.greyhound.util.Constants;
 import com.jayjaylab.androiddemo.app.greyhound.util.GPXWriter;
+import com.jayjaylab.androiddemo.util.AndroidHelper;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -104,7 +106,9 @@ public class ServiceRecordingPath extends RoboService implements
         Ln.d("onCreate()");
 
         File[] files = ContextCompat.getExternalFilesDirs(this, null);
-        DIR_PATH = files[0].getAbsolutePath();
+//        DIR_PATH = files[0].getAbsolutePath();
+        DIR_PATH = Environment.getExternalStorageDirectory() + "/jayjaylab";    // FIXME for testing
+        AndroidHelper.makeDirectory(DIR_PATH);
 
 //        recordingState = RECORDING_STATE.IDLE;
         setLocationRequest();
@@ -149,6 +153,10 @@ public class ServiceRecordingPath extends RoboService implements
     @Override
     public IBinder onBind(Intent intent) {
         Ln.d("onBind()");
+        if(intent != null) {
+            resultReceiver = intent.getParcelableExtra("receiver");
+        }
+
         return messenger.getBinder();
     }
 
