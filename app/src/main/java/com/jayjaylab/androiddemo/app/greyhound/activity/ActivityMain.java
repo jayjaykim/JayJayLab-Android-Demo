@@ -224,6 +224,7 @@ public class ActivityMain extends RoboActionBarActivity {
                     break;
                 case Constants.MSG_ONFINISH_STOP_RECORDING:
                     unbindServiceIfNeed();
+                    // TODO store the result in db
                     break;
                 case Constants.MSG_NO_GOOGLE_SERVICE:
                     break;
