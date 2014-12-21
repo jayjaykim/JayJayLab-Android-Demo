@@ -90,7 +90,10 @@ public class FragmentPathHistory extends RoboFragment {
 
     public void addPath(com.jayjaylab.androiddemo.app.greyhound.model.Path path) {
         Ln.d("addPath() : path : %s", path);
-        pathDao.insert(path.getPathEntity());
+
+        pathDao.insertWithoutSettingPk(path.getPathEntity());
+//        pathDao.insert(path.getPathEntity());
+
         // TODO adds to adapter?
     }
 }

@@ -142,7 +142,8 @@ public class ServiceRecordingPath extends RoboService implements
     @Override
     public void onDestroy() {
         Ln.d("onDestroy()");
-        // TODO stop recording and flushes all out
+        // stops recording and flushes all out
+        stopRecording();
 
         super.onDestroy();
     }
@@ -164,6 +165,8 @@ public class ServiceRecordingPath extends RoboService implements
     }
 
     protected void checkPrecondition() {
+        Ln.d("checkPrecondition()");
+
         if(!servicesConnected()) {
             if(resultReceiver != null)
                 resultReceiver.send(Constants.MSG_NO_GOOGLE_SERVICE, null);
@@ -226,17 +229,20 @@ public class ServiceRecordingPath extends RoboService implements
     protected void stopRecording() {
         Ln.d("stopRecording()");
 
-        locationClient.removeLocationUpdates(ServiceRecordingPath.this);
-        currentPath.getPathEntity().setEndTime(new DateTime().toString());
-        currentPath.getPathEntity().setGpxPath(gpxWriter.getAbsolutePath());
-        Ln.d("stopRecording() : currentPath : %s", currentPath);
-        gpxWriter.closeFile();
+        if(currentPath != null) {
+            locationClient.removeLocationUpdates(ServiceRecordingPath.this);
+            currentPath.getPathEntity().setEndTime(new DateTime().toString());
+            Ln.d("stopRecording() : currentPath : %s", currentPath);
+            gpxWriter.closeFile();
 
-        // returns an instance of Path to the client so that the client can make use of the
-        // recorded path. e.g. storing it in database to show it in UI.
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("path", currentPath);
-        resultReceiver.send(Constants.MSG_ONFINISH_STOP_RECORDING, bundle);
+            // returns an instance of Path to the client so that the client can make use of the
+            // recorded path. e.g. storing it in database to show it in UI.
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("path", currentPath);
+            resultReceiver.send(Constants.MSG_ONFINISH_STOP_RECORDING, bundle);
+
+            currentPath = null;
+        }
     }
 
     protected class IncomingHandler extends Handler {

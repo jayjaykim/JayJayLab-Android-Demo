@@ -42,7 +42,8 @@ public class Path implements Parcelable {
     }
 
     protected void readFromParcel(Parcel in) {
-        pathEntity.setId(in.readLong());
+        final Long id = in.readLong();
+        pathEntity.setId(id == -1L ? null : id);
         pathEntity.setStartTime(in.readString());
         pathEntity.setEndTime(in.readString());
         pathEntity.setGpxPath(in.readString());
@@ -55,7 +56,7 @@ public class Path implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(pathEntity.getId());
+        dest.writeLong(pathEntity.getId() == null ? -1L : pathEntity.getId());
         dest.writeString(pathEntity.getStartTime());
         dest.writeString(pathEntity.getEndTime());
         dest.writeString(pathEntity.getGpxPath());

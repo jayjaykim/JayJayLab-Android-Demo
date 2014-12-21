@@ -11,9 +11,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.ResultReceiver;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -104,7 +102,7 @@ public class ActivityMain extends RoboActionBarActivity {
     }
 
     protected void startRecording() {
-        startRecordingPathServiceIfNeed();
+        startRecordingPathServiceIfNeeded();
         bindServiceIfNeed();
 
 
@@ -122,7 +120,7 @@ public class ActivityMain extends RoboActionBarActivity {
     }
 
     protected void pauseRecording() {
-        startRecordingPathServiceIfNeed();
+        startRecordingPathServiceIfNeeded();
         bindServiceIfNeed();
 
         if(serviceMessenger == null) {
@@ -139,7 +137,7 @@ public class ActivityMain extends RoboActionBarActivity {
     }
 
     protected void stopRecording() {
-        startRecordingPathServiceIfNeed();
+        startRecordingPathServiceIfNeeded();
         bindServiceIfNeed();
 
         if(serviceMessenger == null) {
@@ -155,13 +153,20 @@ public class ActivityMain extends RoboActionBarActivity {
         }
     }
 
-    protected void startRecordingPathServiceIfNeed() {
+    protected void startRecordingPathServiceIfNeeded() {
+        Ln.d("startRecordingPathServiceIfNeeded()");
+
         if(!AndroidHelper.isServiceRunning(this, ServiceRecordingPath.class)) {
             Intent intent = new Intent(this, ServiceRecordingPath.class);
             intent.putExtra("receiver", resultReceiver);
             startService(intent);
+            Ln.d("startRecordingPathServiceIfNeeded() : service gets started...");
         }
     }
+
+//    protected void stopRecordingPathServiceIfNeeded() {
+//        Ln.d("stopRecordingPathServiceIfNeeded()");
+//    }
 
     protected void bindServiceIfNeed() {
         if(!isBound) {

@@ -23,7 +23,7 @@ public class PathDao extends AbstractDao<Path, Long> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Id = new Property(0, long.class, "id", true, "_id");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property GpxPath = new Property(1, String.class, "gpxPath", false, "GPX_PATH");
         public final static Property StartTime = new Property(2, String.class, "startTime", false, "START_TIME");
         public final static Property EndTime = new Property(3, String.class, "endTime", false, "END_TIME");
@@ -42,10 +42,13 @@ public class PathDao extends AbstractDao<Path, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'path' (" + //
-                "'_id' INTEGER PRIMARY KEY NOT NULL ," + // 0: id
+                "'_id' INTEGER PRIMARY KEY ASC AUTOINCREMENT ," + // 0: id
                 "'GPX_PATH' TEXT NOT NULL ," + // 1: gpxPath
                 "'START_TIME' TEXT NOT NULL ," + // 2: startTime
                 "'END_TIME' TEXT NOT NULL );"); // 3: endTime
+        // Add Indexes
+        db.execSQL("CREATE INDEX " + constraint + "IDX_path__id ON path" +
+                " (_id);");
     }
 
     /** Drops the underlying database table. */
@@ -58,7 +61,11 @@ public class PathDao extends AbstractDao<Path, Long> {
     @Override
     protected void bindValues(SQLiteStatement stmt, Path entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
         stmt.bindString(2, entity.getGpxPath());
         stmt.bindString(3, entity.getStartTime());
         stmt.bindString(4, entity.getEndTime());
@@ -67,14 +74,14 @@ public class PathDao extends AbstractDao<Path, Long> {
     /** @inheritdoc */
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.getLong(offset + 0);
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Path readEntity(Cursor cursor, int offset) {
         Path entity = new Path( //
-            cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getString(offset + 1), // gpxPath
             cursor.getString(offset + 2), // startTime
             cursor.getString(offset + 3) // endTime
@@ -85,7 +92,7 @@ public class PathDao extends AbstractDao<Path, Long> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Path entity, int offset) {
-        entity.setId(cursor.getLong(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setGpxPath(cursor.getString(offset + 1));
         entity.setStartTime(cursor.getString(offset + 2));
         entity.setEndTime(cursor.getString(offset + 3));

@@ -10,7 +10,7 @@ import org.acra.annotation.ReportsCrashes;
  */
 @ReportsCrashes(
         formKey = "",
-        mailTo = "jayjay@diogroup.co.kr",
+        mailTo = "jayjaylab.ceo@gmail.com",
         customReportContent = {ReportField.APP_VERSION_CODE, ReportField.ANDROID_VERSION,
                 ReportField.APP_VERSION_NAME, ReportField.PHONE_MODEL, ReportField.STACK_TRACE,
                 ReportField.LOGCAT},

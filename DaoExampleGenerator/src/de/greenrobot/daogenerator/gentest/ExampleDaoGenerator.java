@@ -47,7 +47,7 @@ public class ExampleDaoGenerator {
         // end_time datetime
         Entity path = schema.addEntity("Path");
         path.setTableName("path");
-        path.addIdProperty().notNull();
+        path.addIdProperty().primaryKeyAsc().autoincrement().index();
         path.addStringProperty("gpxPath").notNull();
         path.addStringProperty("startTime").notNull();
         path.addStringProperty("endTime").notNull();

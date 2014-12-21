@@ -6,7 +6,7 @@ package com.jayjaylab.androiddemo;
  */
 public class Path {
 
-    private long id;
+    private Long id;
     /** Not-null value. */
     private String gpxPath;
     /** Not-null value. */
@@ -17,22 +17,22 @@ public class Path {
     public Path() {
     }
 
-    public Path(long id) {
+    public Path(Long id) {
         this.id = id;
     }
 
-    public Path(long id, String gpxPath, String startTime, String endTime) {
+    public Path(Long id, String gpxPath, String startTime, String endTime) {
         this.id = id;
         this.gpxPath = gpxPath;
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
