@@ -66,6 +66,13 @@ public class GPXWriter {
         return true;
     }
 
+    public String getAbsolutePath() {
+        if(currentFile == null)
+            return null;
+        else
+            return currentFile.getAbsolutePath();
+    }
+
     protected boolean wrtieStringToFile(String text) {
         byteBuffer.clear();
         byteBuffer.put(text.getBytes());

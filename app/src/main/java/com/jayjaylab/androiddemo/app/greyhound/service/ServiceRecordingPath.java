@@ -25,9 +25,12 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
+import com.jayjaylab.androiddemo.app.greyhound.model.Path;
 import com.jayjaylab.androiddemo.app.greyhound.util.Constants;
 import com.jayjaylab.androiddemo.app.greyhound.util.GPXWriter;
 import com.jayjaylab.androiddemo.util.AndroidHelper;
+
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -59,7 +62,7 @@ public class ServiceRecordingPath extends RoboService implements
     String DIR_PATH;
 
     boolean isLocationServiceConnected;
-
+    com.jayjaylab.androiddemo.app.greyhound.model.Path currentPath;
 
     ResultReceiver resultReceiver;
     LocationClient locationClient;
@@ -105,9 +108,9 @@ public class ServiceRecordingPath extends RoboService implements
     public void onCreate() {
         Ln.d("onCreate()");
 
-        File[] files = ContextCompat.getExternalFilesDirs(this, null);
+//        File[] files = ContextCompat.getExternalFilesDirs(this, null);
 //        DIR_PATH = files[0].getAbsolutePath();
-        DIR_PATH = Environment.getExternalStorageDirectory() + "/jayjaylab";    // FIXME for testing
+        DIR_PATH = Environment.getExternalStorageDirectory() + "/jayjaylab";
         AndroidHelper.makeDirectory(DIR_PATH);
 
 //        recordingState = RECORDING_STATE.IDLE;
@@ -196,6 +199,9 @@ public class ServiceRecordingPath extends RoboService implements
     protected void startRecording() {
         Ln.d("startRecording()");
 
+        currentPath = new Path();
+        currentPath.getPathEntity().setStartTime(new DateTime().toString());
+        Ln.d("startRecording() : currentPath : %s", currentPath);
         if(gpxWriter.isFileClosed()) {
             boolean opened = gpxWriter.openFile(DIR_PATH, getFileName() + GPX_FILE_EXTENSION);
             if(!opened) {
@@ -205,6 +211,7 @@ public class ServiceRecordingPath extends RoboService implements
                 return;
             }
         }
+        currentPath.getPathEntity().setGpxPath(gpxWriter.getAbsolutePath());
         locationClient.requestLocationUpdates(locationRequest, ServiceRecordingPath.this);
         resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, null);
     }
@@ -219,9 +226,17 @@ public class ServiceRecordingPath extends RoboService implements
     protected void stopRecording() {
         Ln.d("stopRecording()");
 
-        gpxWriter.closeFile();
         locationClient.removeLocationUpdates(ServiceRecordingPath.this);
-        resultReceiver.send(Constants.MSG_ONFINISH_STOP_RECORDING, null);
+        currentPath.getPathEntity().setEndTime(new DateTime().toString());
+        currentPath.getPathEntity().setGpxPath(gpxWriter.getAbsolutePath());
+        Ln.d("stopRecording() : currentPath : %s", currentPath);
+        gpxWriter.closeFile();
+
+        // returns an instance of Path to the client so that the client can make use of the
+        // recorded path. e.g. storing it in database to show it in UI.
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("path", currentPath);
+        resultReceiver.send(Constants.MSG_ONFINISH_STOP_RECORDING, bundle);
     }
 
     protected class IncomingHandler extends Handler {

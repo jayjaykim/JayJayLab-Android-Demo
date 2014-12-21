@@ -4,6 +4,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
+ * This class contains an instance of database Path entity produced by GreenDao Framework.<br>
+ * The purpose of this class is to provide a parcelable class of the database entity created by
+ * GreenDao framework.
+ *
  * Created by jongjoo on 12/7/14.
  */
 public class Path implements Parcelable {
@@ -21,6 +25,20 @@ public class Path implements Parcelable {
         }
 
         readFromParcel(in);
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("id : " + pathEntity.getId());
+        builder.append(", startTime : " + pathEntity.getStartTime());
+        builder.append(", endTime : " + pathEntity.getEndTime());
+        builder.append(", gpxPath : " + pathEntity.getGpxPath());
+
+        return builder.toString();
+    }
+
+    public com.jayjaylab.androiddemo.Path getPathEntity() {
+        return pathEntity;
     }
 
     protected void readFromParcel(Parcel in) {

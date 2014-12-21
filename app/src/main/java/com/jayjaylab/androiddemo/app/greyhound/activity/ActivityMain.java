@@ -224,7 +224,17 @@ public class ActivityMain extends RoboActionBarActivity {
                     break;
                 case Constants.MSG_ONFINISH_STOP_RECORDING:
                     unbindServiceIfNeed();
-                    // TODO store the result in db
+                    if(resultData == null) {
+                        // TODO displays an error message
+                    } else {
+                        // stores the result in db
+                        FragmentPathHistory fragmentPathHistory = (FragmentPathHistory)
+                                getSupportFragmentManager().findFragmentByTag(
+                                        FragmentPathHistory.TAG);
+                        fragmentPathHistory.addPath(
+                                (com.jayjaylab.androiddemo.app.greyhound.model.Path)
+                                        resultData.getParcelable("path"));
+                    }
                     break;
                 case Constants.MSG_NO_GOOGLE_SERVICE:
                     break;
