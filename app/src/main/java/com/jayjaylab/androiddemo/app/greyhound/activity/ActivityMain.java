@@ -240,6 +240,8 @@ public class ActivityMain extends RoboActionBarActivity {
                                 (com.jayjaylab.androiddemo.app.greyhound.model.Path)
                                         resultData.getParcelable("path"));
                     }
+                    isPaused = true;
+                    imagebuttonRecordPause.setImageResource(R.drawable.record);
                     break;
                 case Constants.MSG_NO_GOOGLE_SERVICE:
                     break;

@@ -92,8 +92,6 @@ public class FragmentPathHistory extends RoboFragment {
         Ln.d("addPath() : path : %s", path);
 
         pathDao.insertWithoutSettingPk(path.getPathEntity());
-//        pathDao.insert(path.getPathEntity());
-
-        // TODO adds to adapter?
+        adapter.addItem(path.getPathEntity());
     }
 }

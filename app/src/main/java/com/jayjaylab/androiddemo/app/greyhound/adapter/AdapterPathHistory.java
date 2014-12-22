@@ -9,21 +9,34 @@ import android.widget.TextView;
 import com.jayjaylab.androiddemo.Path;
 import com.jayjaylab.androiddemo.R;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by jongjoo on 11/22/14.
  */
 public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.ViewHolder> {
     List<Path> items = new ArrayList<Path>(20);
+    DateTimeFormatter fmt;
+
+    public AdapterPathHistory() {
+//        fmt = DateTimeFormat.forPattern("yyyy MMMM d");
+        fmt = DateTimeFormat.forStyle("FF").withLocale(Locale.KOREAN);
+    }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         final Path path = items.get(position);
         if(path != null) {
-            viewHolder.textviewDateTime.setText(path.getStartTime());
-            viewHolder.textviewPathInfo.setText(path.getEndTime());
+            DateTime startDatetime = DateTime.parse(path.getStartTime());
+            DateTime endDatetime = DateTime.parse(path.getEndTime());
+            viewHolder.textviewDateTime.setText(fmt.print(startDatetime));
+            viewHolder.textviewPathInfo.setText(fmt.print(endDatetime));
         }
     }
 
@@ -48,6 +61,11 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         // this will causes problems because this method has some bugs reported
         // in Google bug tracking site
         notifyDataSetChanged();
+    }
+
+    public void addItem(Path path) {
+        items.add(path);
+        notifyItemInserted(items.size() - 1);
     }
 
     public Path getItem(int position) {
