@@ -50,6 +50,19 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
             DateTime endDatetime = DateTime.parse(path.getEndTime());
             viewHolder.textviewDateTime.setText(fmt.print(startDatetime));
             viewHolder.textviewPathInfo.setText(fmt.print(endDatetime));
+            viewHolder.layouit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO
+                }
+            });
+            viewHolder.layouit.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    // TODO
+                    return false;
+                }
+            });
         }
     }
 
@@ -58,6 +71,7 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         View view = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.recyclerview_item_greyhound_path_history, parent, false);
         ViewHolder vh = new ViewHolder(view);
+        vh.layouit = view.findViewById(R.id.layout);
         vh.textviewDateTime = (TextView)view.findViewById(R.id.textview_datetime);
         vh.textviewPathInfo = (TextView)view.findViewById(R.id.textview_pathinfo);
 
@@ -98,6 +112,7 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textviewDateTime;
         public TextView textviewPathInfo;
+        public View layouit;
 
         public ViewHolder(View itemView) {
             super(itemView);
