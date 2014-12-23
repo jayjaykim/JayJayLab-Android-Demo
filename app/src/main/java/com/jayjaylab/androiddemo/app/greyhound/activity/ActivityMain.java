@@ -207,10 +207,15 @@ public class ActivityMain extends RoboActionBarActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Ln.d("onServiceDisconnected() : name : %s", name);
-            serviceMessenger = null;
-            isBound = false;
+//            handleOnServiceDisconnected();
         }
     };
+
+    protected void handleOnServiceDisconnected() {
+        serviceMessenger = null;
+        messegeToBeSentOnceConnected = null;
+        isBound = false;
+    }
 
     protected ResultReceiver resultReceiver = new ResultReceiver(handler) {
         @Override
@@ -241,7 +246,13 @@ public class ActivityMain extends RoboActionBarActivity {
                                         resultData.getParcelable("path"));
                     }
                     isPaused = true;
-                    imagebuttonRecordPause.setImageResource(R.drawable.record);
+                    handleOnServiceDisconnected();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            imagebuttonRecordPause.setImageResource(R.drawable.record);
+                        }
+                    });
                     break;
                 case Constants.MSG_NO_GOOGLE_SERVICE:
                     break;
