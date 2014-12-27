@@ -141,7 +141,12 @@ public class FragmentPathHistory extends RoboFragment {
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
             switch(menuItem.getItemId()) {
                 case R.id.menu_delete:
-                    // TODO async deletetion
+                    // FIXME async deletetion
+                    List<AdapterPathHistory.PathImpl> pathImplList = adapter.getSelectedItems();
+                    for(AdapterPathHistory.PathImpl path : pathImplList) {
+                        adapter.removeItem(path);
+                        pathDao.delete(path.getPath());
+                    }
                     actionMode.finish();
                     return true;
                 default:

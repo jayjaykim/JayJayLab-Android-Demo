@@ -140,6 +140,24 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         });
     }
 
+    public List<PathImpl> getSelectedItems() {
+        ArrayList<PathImpl> list = new ArrayList<PathImpl>(10);
+
+        for(PathImpl path : items) {
+            if(path.isSelected) {
+                list.add(path);
+            }
+        }
+
+        return list;
+    }
+
+    public void removeItem(PathImpl pathImpl) {
+        final int index = items.indexOf(pathImpl);
+        items.remove(index);
+        notifyItemRemoved(index);
+    }
+
     public void cancelCAB() {
         Ln.d("cancelCAB()");
 
