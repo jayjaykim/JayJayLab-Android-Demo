@@ -11,8 +11,13 @@
     <string name="app_title_collie">Collie</string>
     <string name="app_title_wild_dog">Wild Dog</string>
 
+    <!-- used in ActivityMain -->
     <string name="more">more</string>
     <string name="opensource_license">OpenSource License</string>
+
+    <!-- used in FragmentPathHistory -->
+    <string name="delete">Delete</string>
+    <string name="selected">Selected</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

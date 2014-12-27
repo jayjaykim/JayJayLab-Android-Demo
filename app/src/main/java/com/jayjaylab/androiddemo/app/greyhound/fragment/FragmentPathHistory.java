@@ -2,9 +2,15 @@ package com.jayjaylab.androiddemo.app.greyhound.fragment;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,9 +21,12 @@ import com.jayjaylab.androiddemo.Path;
 import com.jayjaylab.androiddemo.PathDao;
 import com.jayjaylab.androiddemo.R;
 import com.jayjaylab.androiddemo.app.greyhound.adapter.AdapterPathHistory;
+import com.jayjaylab.androiddemo.event.OnClickEvent;
+import com.jayjaylab.androiddemo.event.OnLongClickEvent;
 
 import java.util.List;
 
+import roboguice.event.Observes;
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
 import roboguice.util.Ln;
@@ -30,9 +39,11 @@ public class FragmentPathHistory extends RoboFragment {
     public static final String TAG = FragmentPathHistory.class.getSimpleName();
     private final int HISTORY_ROW_NUM_LIMIT = 10;
 
+    ActionMode actionMode;
     DaoSession daoSession;
     PathDao pathDao;
 
+    @Inject Handler handler;
     @Inject AdapterPathHistory adapter;
     // views
     @InjectView(R.id.recycler_view) RecyclerView recyclerView;
@@ -49,6 +60,24 @@ public class FragmentPathHistory extends RoboFragment {
         createDaoSession();
         setViews();
         loadTenPaths(-1);
+    }
+
+    protected void handleOnClickEvent(@Observes OnClickEvent event) {
+        Ln.d("handleOnClickEvent() : event : %s", event);
+
+        if(actionMode != null) {
+            actionMode.setTitle(String.valueOf(adapter.getCountSelected()) + " " + getResources().getString(R.string.selected));
+        }
+    }
+
+    protected void handleOnLongClickEvent(@Observes OnLongClickEvent event) {
+        Ln.d("handleOnLongClickEvent() : actionMode : %s, event : %s", actionMode, event);
+        if(actionMode != null) {
+            return;
+        }
+
+        actionMode = ((ActionBarActivity)getActivity()).startSupportActionMode(actionModeCallback);
+        actionMode.setTitle(String.valueOf(adapter.getCountSelected()) + " " + getResources().getString(R.string.selected));
     }
 
     protected void setViews() {
@@ -94,4 +123,36 @@ public class FragmentPathHistory extends RoboFragment {
         pathDao.insertWithoutSettingPk(path.getPathEntity());
         adapter.addItem(path.getPathEntity());
     }
+
+    protected ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            MenuInflater inflater = actionMode.getMenuInflater();
+            inflater.inflate(R.menu.menu_cab_fragment_path_history, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            switch(menuItem.getItemId()) {
+                case R.id.menu_delete:
+                    // TODO async deletetion
+                    actionMode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+            FragmentPathHistory.this.actionMode = null;
+            adapter.cancelCAB();
+        }
+    };
 }

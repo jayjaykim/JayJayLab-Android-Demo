@@ -17,22 +17,6 @@
             <TextView android:id="@+id/textview_pathinfo"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:singleLine="true" android:textSize="16dp"/>
-            <!--
-            <HorizontalScrollView
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:scrollbars="none">
-                <TextView android:id="@+id/textview_datetime"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:singleLine="true" android:textSize="20dp" android:textStyle="bold"/>
-            </HorizontalScrollView>
-            <HorizontalScrollView
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:scrollbars="none">
-                <TextView android:id="@+id/textview_pathinfo"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:singleLine="true" android:textSize="16dp"/>
-            </HorizontalScrollView>
-            -->
         </LinearLayout>
     </FrameLayout>
 </android.support.v7.widget.CardView>
