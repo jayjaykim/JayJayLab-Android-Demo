@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
@@ -54,45 +55,60 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         readWriteLock.readLock().unlock();
 
         if(pathImpl != null) {
-            DateTime startDatetime = DateTime.parse(pathImpl.getPath().getStartTime());
-            DateTime endDatetime = DateTime.parse(pathImpl.getPath().getEndTime());
-            viewHolder.textviewDateTime.setText(fmt.print(startDatetime));
-            viewHolder.textviewPathInfo.setText(fmt.print(endDatetime));
-            if(pathImpl.isSelected()) {
-                viewHolder.layout.setBackgroundResource(R.color.background_collection_selected);
-            } else {
-                viewHolder.layout.setBackgroundResource(R.drawable.selector_gridcell_mainapp);
-            }
-            viewHolder.layout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Ln.d("onClick()");
-                    if(isLongClicked) {
-                        isLongClicked = false;
-                        return;
-                    }
+            if(pathImpl.getPath() == null) {
+                viewHolder.layoutContent.setVisibility(View.INVISIBLE);
+                viewHolder.layoutNext.setVisibility(View.VISIBLE);
 
-                    if(isCABActivated) {
+                viewHolder.buttonNext.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO loads next 10 paths
+                    }
+                });
+            } else {
+                viewHolder.layoutContent.setVisibility(View.VISIBLE);
+                viewHolder.layoutNext.setVisibility(View.INVISIBLE);
+
+                DateTime startDatetime = DateTime.parse(pathImpl.getPath().getStartTime());
+                DateTime endDatetime = DateTime.parse(pathImpl.getPath().getEndTime());
+                viewHolder.textviewDateTime.setText(fmt.print(startDatetime));
+                viewHolder.textviewPathInfo.setText(fmt.print(endDatetime));
+                if (pathImpl.isSelected()) {
+                    viewHolder.layout.setBackgroundResource(R.color.background_collection_selected);
+                } else {
+                    viewHolder.layout.setBackgroundResource(R.drawable.selector_gridcell_mainapp);
+                }
+                viewHolder.layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Ln.d("onClick()");
+                        if (isLongClicked) {
+                            isLongClicked = false;
+                            return;
+                        }
+
+                        if (isCABActivated) {
+                            pathImpl.setSelected(!pathImpl.isSelected);
+                            countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
+                            notifyItemChanged(position);
+                            eventManager.fire(new OnClickEvent(viewHolder.layout, position));
+                        }
+                    }
+                });
+                viewHolder.layout.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        isCABActivated = true;
+                        isLongClicked = true;
+                        // activates CAB
                         pathImpl.setSelected(!pathImpl.isSelected);
                         countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
                         notifyItemChanged(position);
-                        eventManager.fire(new OnClickEvent(viewHolder.layout, position));
+                        eventManager.fire(new OnLongClickEvent(viewHolder.layout, position));
+                        return false;
                     }
-                }
-            });
-            viewHolder.layout.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    isCABActivated = true;
-                    isLongClicked = true;
-                    // activates CAB
-                    pathImpl.setSelected(!pathImpl.isSelected);
-                    countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
-                    notifyItemChanged(position);
-                    eventManager.fire(new OnLongClickEvent(viewHolder.layout, position));
-                    return false;
-                }
-            });
+                });
+            }
         }
     }
 
@@ -102,8 +118,11 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
                 R.layout.recyclerview_item_greyhound_path_history, parent, false);
         ViewHolder vh = new ViewHolder(view);
         vh.layout = view.findViewById(R.id.layout);
+        vh.layoutContent = view.findViewById(R.id.layout_content);
+        vh.layoutNext = view.findViewById(R.id.layout_to_next);
         vh.textviewDateTime = (TextView)view.findViewById(R.id.textview_datetime);
         vh.textviewPathInfo = (TextView)view.findViewById(R.id.textview_pathinfo);
+        vh.buttonNext = (Button)view.findViewById(R.id.button_next);
 
         return vh;
     }
@@ -113,18 +132,66 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         return items.size();
     }
 
+    /**
+     * Adds a group of items at the bottom of the list. The items are from database.
+     * @param paths a bunch of Path instances
+     */
     public void addItems(List<Path> paths) {
+        Ln.d("addItems() : paths : %s", paths);
+        /**
+         * Logic
+         * pre condition :
+         * post condition : "Load More" button must be at the bottom of the list always
+         * until there's no more items to be shown.
+         * flow : a bunch of items always get added at the bottom.
+         */
+
+        removeLoadMoreButton();
+
+        final int sizePrev = items.size();
+        final int sizePost = sizePrev + paths.size();
         ArrayList<PathImpl> list = new ArrayList<PathImpl>(paths.size());
         for(Path path : paths) {
             list.add(PathImpl.createPathImpl(path));
         }
 
         items.addAll(list);
+
         // this will causes problems because this method has some bugs reported
         // in Google bug tracking site
-        notifyDataSetChanged();
+        for(int i = sizePrev; i < sizePost; i++) {
+            notifyItemInserted(i);
+        }
+
+        addLoadMoreButton(paths);
     }
 
+    protected void removeLoadMoreButton() {
+        Ln.d("removeLoadMoreButton()");
+        final int size = items.size();
+        if(size == 0)
+            return;
+
+        PathImpl pathImpl = items.get(size - 1);
+        if(pathImpl.getPath() == null) {
+            items.remove(items.size() - 1);
+            notifyItemRemoved(size - 1);
+        }
+    }
+
+    protected void addLoadMoreButton(List<Path> paths) {
+        Ln.d("addLoadMoreButton()");
+        if(paths.size() == 0)
+            return;
+
+        items.add(new PathImpl(null, false));
+        notifyItemInserted(items.size() - 1);
+    }
+
+    /**
+     * Adds item on top of list. The item is the record which has just been recorded.
+     * @param path an instance of Path
+     */
     public void addItem(final Path path) {
         Ln.d("addItem() : path : %s", path);
 
@@ -181,7 +248,10 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textviewDateTime;
         public TextView textviewPathInfo;
+        public Button buttonNext;
         public View layout;
+        public View layoutContent;
+        public View layoutNext;
 
         public ViewHolder(View itemView) {
             super(itemView);

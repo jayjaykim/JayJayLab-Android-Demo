@@ -20,6 +20,7 @@
     <!-- used in FragmentPathHistory -->
     <string name="delete">Delete</string>
     <string name="selected">Selected</string>
+    <string name="load_more">Load more</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
