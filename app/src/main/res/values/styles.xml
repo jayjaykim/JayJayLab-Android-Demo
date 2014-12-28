@@ -14,4 +14,7 @@
         <item name="windowActionModeOverlay">true</item>
     </style>
 
+    <style name="LicenseDialogTheme" parent="Theme.AppCompat.Light">
+        <item name="android:textColor">#FF00DFFF</item>
+    </style>
 </resources>

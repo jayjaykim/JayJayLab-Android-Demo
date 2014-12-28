@@ -9,4 +9,6 @@
     <item name="background_main_gridcell_unfocused" type="color">#00000000</item>
     <item name="background_main_gridcell_focued" type="color">#dddddddd</item>
     <item name="background_collection_selected" type="color">#ddCDC5BF</item>
+
+    <color name="license_dialog_divider_color">#FF79FF00</color>
 </resources>

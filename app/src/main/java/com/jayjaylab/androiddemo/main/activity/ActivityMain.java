@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
@@ -18,6 +20,7 @@ import com.jayjaylab.androiddemo.main.model.App;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.psdev.licensesdialog.LicensesDialogFragment;
 import roboguice.activity.RoboActionBarActivity;
 import roboguice.activity.event.OnPauseEvent;
 import roboguice.context.event.OnCreateEvent;
@@ -29,6 +32,8 @@ import roboguice.util.Ln;
 
 @ContentView(R.layout.activity_main)
 public class ActivityMain extends RoboActionBarActivity {
+
+    private long backKeyPressedTime = 0;
 //    @Inject ImageViewThreadPool  imageViewThreadPool;
     @Inject AdapterMain adapter;
 
@@ -54,6 +59,19 @@ public class ActivityMain extends RoboActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_activity_main, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.menu_license:
+                final LicensesDialogFragment fragment = LicensesDialogFragment.newInstance(
+                        R.raw.notices, false, true, R.style.LicenseDialogTheme, R.color.license_dialog_divider_color, this);
+                fragment.show(getSupportFragmentManager(), null);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void handleOnGridItemClickEvent(@Observes OnClickEvent event) {
@@ -84,6 +102,18 @@ public class ActivityMain extends RoboActionBarActivity {
 
     public void onPauseEvent(@Observes OnPauseEvent event) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(System.currentTimeMillis() > backKeyPressedTime + 2000) {
+            backKeyPressedTime = System.currentTimeMillis();
+            Toast.makeText(this, R.string.back_exit, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+            finish();
+        }
     }
 
     protected void setViews() {

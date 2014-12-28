@@ -55,6 +55,9 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.4.0'
     compile 'com.google.android.gms:play-services:6.1.71'
     compile 'joda-time:joda-time:2.6'
+    compile('de.psdev.licensesdialog:licensesdialog:1.6.0') {
+        exclude module: 'support-v4'
+    }
 }
 
 dependencies {

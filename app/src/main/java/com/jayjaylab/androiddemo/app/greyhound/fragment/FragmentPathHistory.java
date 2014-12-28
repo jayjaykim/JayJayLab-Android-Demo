@@ -114,6 +114,7 @@ public class FragmentPathHistory extends RoboFragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setOnScrollListener(onScrollListener);
         recyclerView.setAdapter(adapter);
     }
 
@@ -158,6 +159,20 @@ public class FragmentPathHistory extends RoboFragment {
         public void onDestroyActionMode(ActionMode actionMode) {
             FragmentPathHistory.this.actionMode = null;
             adapter.cancelCAB();
+        }
+    };
+
+    RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            Ln.d("onScrollStateChanged() : newState : %d", newState);
+            super.onScrollStateChanged(recyclerView, newState);
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            Ln.d("onScrolled() : dx : %d, dy : %d", dx, dy);
+            super.onScrolled(recyclerView, dx, dy);
         }
     };
 }

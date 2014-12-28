@@ -12,6 +12,7 @@ import android.os.RemoteException;
 import android.os.ResultReceiver;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -163,10 +164,6 @@ public class ActivityMain extends RoboActionBarActivity {
             Ln.d("startRecordingPathServiceIfNeeded() : service gets started...");
         }
     }
-
-//    protected void stopRecordingPathServiceIfNeeded() {
-//        Ln.d("stopRecordingPathServiceIfNeeded()");
-//    }
 
     protected void bindServiceIfNeed() {
         if(!isBound) {

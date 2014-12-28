@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">JayJayLab-Android-Demo</string>
+    <string name="back_exit">Press \'Back\' button once more to exit.</string>
 
     <!-- App Descriptions -->
     <string name="app_description_greyhound">This native app records your walking path and shows your walking history</string>
     <string name="app_description_collie">This webapp offers new mobile shopping experiences to people</string>
     <string name="app_description_wilddog">This webapp provides hotels, inns info for people to stay and finally be able to book</string>
+
     <!-- App Titles -->
     <string name="app_title_grey_hound">Grey Hound</string>
     <string name="app_title_collie">Collie</string>
