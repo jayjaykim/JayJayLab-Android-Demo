@@ -31,6 +31,9 @@ import roboguice.util.Ln;
  * Created by jongjoo on 11/22/14.
  */
 public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.ViewHolder> {
+    public static String TAG_CLICK_IN_SELECT_MODE = "clicked_select_mode";
+    public static String TAG_CLICK_LOAD_MORE = "clicked_load_more";
+
     List<PathImpl> items = new ArrayList<PathImpl>(20);
     DateTimeFormatter fmt;
     ReadWriteLock readWriteLock;
@@ -62,7 +65,8 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
                 viewHolder.buttonNext.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO loads next 10 paths
+                        // loads next 10 paths
+                        eventManager.fire(new OnClickEvent(viewHolder.layout, position, TAG_CLICK_LOAD_MORE));
                     }
                 });
             } else {
@@ -91,7 +95,7 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
                             pathImpl.setSelected(!pathImpl.isSelected);
                             countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
                             notifyItemChanged(position);
-                            eventManager.fire(new OnClickEvent(viewHolder.layout, position));
+                            eventManager.fire(new OnClickEvent(viewHolder.layout, position, TAG_CLICK_IN_SELECT_MODE));
                         }
                     }
                 });
@@ -152,6 +156,7 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         final int sizePost = sizePrev + paths.size();
         ArrayList<PathImpl> list = new ArrayList<PathImpl>(paths.size());
         for(Path path : paths) {
+            Ln.d("addItems() : path.id : %d", path.getId());
             list.add(PathImpl.createPathImpl(path));
         }
 
@@ -205,6 +210,21 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
                 readWriteLock.writeLock().unlock();
             }
         });
+    }
+
+    public long getSmallestId() {
+        Ln.d("getSmallestId()");
+
+        final int size = items.size();
+        PathImpl pathImpl = null;
+        for(int i = size - 1; i >= 0; i--) {
+            pathImpl = getItem(i);
+            if(pathImpl.getPath() != null) {
+                return pathImpl.getPath().getId();
+            }
+        }
+
+        return -1;
     }
 
     public List<PathImpl> getSelectedItems() {

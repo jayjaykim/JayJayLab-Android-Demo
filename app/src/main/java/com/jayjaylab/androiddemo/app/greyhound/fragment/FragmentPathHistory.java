@@ -65,8 +65,21 @@ public class FragmentPathHistory extends RoboFragment {
     protected void handleOnClickEvent(@Observes OnClickEvent event) {
         Ln.d("handleOnClickEvent() : event : %s", event);
 
-        if(actionMode != null) {
-            actionMode.setTitle(String.valueOf(adapter.getCountSelected()) + " " + getResources().getString(R.string.selected));
+        if(actionMode == null) {
+            if(event.getTag().equals(AdapterPathHistory.TAG_CLICK_LOAD_MORE)) {
+                // loads more
+                loadTenPaths(adapter.getSmallestId());
+            } else if(event.getTag().equals(AdapterPathHistory.TAG_CLICK_IN_SELECT_MODE)) {
+
+            }
+        } else {
+            if(event.getTag().equals(AdapterPathHistory.TAG_CLICK_LOAD_MORE)) {
+                // loads more
+                loadTenPaths(adapter.getSmallestId());
+            } else if(event.getTag().equals(AdapterPathHistory.TAG_CLICK_IN_SELECT_MODE)) {
+                actionMode.setTitle(String.valueOf(adapter.getCountSelected()) + " " +
+                        getResources().getString(R.string.selected));
+            }
         }
     }
 
@@ -97,7 +110,8 @@ public class FragmentPathHistory extends RoboFragment {
      * @param fromIndex < 0 means loading recent 10 paths,<code>fromIndex</code> > 0 means
      *                  loading 10 paths which is smaller than the index
      */
-    public void loadTenPaths(int fromIndex) {
+    public void loadTenPaths(long fromIndex) {
+        // FIXME needs async loading
         if(fromIndex < 0) {
             // loads the recent ten paths
             List<Path> pathList = pathDao.queryBuilder().
@@ -107,6 +121,12 @@ public class FragmentPathHistory extends RoboFragment {
             adapter.addItems(pathList);
         } else {
             // TODO loads the paths which is smaller than the fromIndex
+            List<Path> pathList = pathDao.queryBuilder().
+                    where(PathDao.Properties.Id.lt(fromIndex)).
+                    orderDesc(PathDao.Properties.Id).
+                    limit(HISTORY_ROW_NUM_LIMIT).list();
+            Ln.d("loadTenPaths() : paths : %s, # paths : %d", pathList, pathList.size());
+            adapter.addItems(pathList);
         }
     }
 
