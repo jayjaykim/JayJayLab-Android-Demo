@@ -21,6 +21,7 @@ import com.jayjaylab.androiddemo.R;
 import com.jayjaylab.androiddemo.app.greyhound.fragment.FragmentPathHistory;
 import com.jayjaylab.androiddemo.app.greyhound.service.ServiceRecordingPath;
 import com.jayjaylab.androiddemo.app.greyhound.util.Constants;
+import com.jayjaylab.androiddemo.main.activity.ActivityBase;
 import com.jayjaylab.androiddemo.util.AndroidHelper;
 
 import roboguice.activity.RoboActionBarActivity;
@@ -31,7 +32,7 @@ import roboguice.inject.InjectView;
 import roboguice.util.Ln;
 
 @ContentView(R.layout.activity_greyhound_main)
-public class ActivityMain extends RoboActionBarActivity {
+public class ActivityMain extends ActivityBase {
 
     boolean isPaused = true;
     boolean isBound = false;

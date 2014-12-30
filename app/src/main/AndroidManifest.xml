@@ -39,6 +39,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jayjaylab.androiddemo.main.activity.ActivityMain" />
         </activity>
+        <activity
+            android:name="com.jayjaylab.androiddemo.main.activity.ActivityBase"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+        </activity>
 
         <service
             android:name="com.jayjaylab.androiddemo.app.greyhound.service.ServiceRecordingPath"

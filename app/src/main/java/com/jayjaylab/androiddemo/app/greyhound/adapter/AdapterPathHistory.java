@@ -239,10 +239,15 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         return list;
     }
 
-    public void removeItem(PathImpl pathImpl) {
-        final int index = items.indexOf(pathImpl);
-        items.remove(index);
-        notifyItemRemoved(index);
+    public void removeItem(final PathImpl pathImpl) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                final int index = items.indexOf(pathImpl);
+                items.remove(index);
+                notifyItemRemoved(index);
+            }
+        });
     }
 
     public void cancelCAB() {
