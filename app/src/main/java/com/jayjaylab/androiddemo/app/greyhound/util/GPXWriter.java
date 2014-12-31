@@ -8,6 +8,8 @@ import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.util.AndroidHelper;
 import com.jayjaylab.androiddemo.util.NIOHelper;
 
+import org.joda.time.DateTime;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -95,7 +97,7 @@ public class GPXWriter {
     protected String getHeader(String name) {
         StringBuilder builder = new StringBuilder();
         builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n");
-        builder.append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" creator=\"gpx4j\" version=\"1.1\" ");
+        builder.append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" creator=\"JayJayLAB\" version=\"1.1\" ");
         builder.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ");
         builder.append("xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n");
         builder.append("\t<trk>\n");
@@ -164,6 +166,13 @@ public class GPXWriter {
 
     public void write(Location location) {
         Ln.d("write() : location : %s", location);
-        // TODO
+        StringBuilder builder = new StringBuilder();
+        builder.append("\t\t\t<trkpt lat=\"" + location.getLatitude() + "\" lon=\"" +
+                location.getLongitude() + "\">\n");
+        builder.append("\t\t\t<ele>" + location.getAltitude() + "</ele>\n");
+        builder.append("\t\t\t<time>" + new DateTime(location.getTime()).toString() + "</time>\n");
+        builder.append("\t\t\t</trkpt>\n");
+
+        wrtieStringToFile(builder.toString());
     }
 }

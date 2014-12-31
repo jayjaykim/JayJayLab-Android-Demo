@@ -98,9 +98,9 @@ public class ActivityMain extends ActivityBase {
         imagebuttonStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isPaused) {
-                    stopRecording();
-                }
+//                if(!isPaused) {
+                  stopRecording();
+//                }
             }
         });
     }

@@ -181,13 +181,13 @@ public class FragmentPathHistory extends RoboFragment {
     RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            Ln.d("onScrollStateChanged() : newState : %d", newState);
+//            Ln.d("onScrollStateChanged() : newState : %d", newState);
             super.onScrollStateChanged(recyclerView, newState);
         }
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            Ln.d("onScrolled() : dx : %d, dy : %d", dx, dy);
+//            Ln.d("onScrolled() : dx : %d, dy : %d", dx, dy);
             super.onScrolled(recyclerView, dx, dy);
         }
     };
