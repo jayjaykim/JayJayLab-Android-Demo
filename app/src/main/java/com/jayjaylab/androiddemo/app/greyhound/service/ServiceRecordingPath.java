@@ -1,6 +1,8 @@
 package com.jayjaylab.androiddemo.app.greyhound.service;
 
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -13,6 +15,9 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.ResultReceiver;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -25,6 +30,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
+import com.jayjaylab.androiddemo.app.greyhound.activity.ActivityMain;
 import com.jayjaylab.androiddemo.app.greyhound.model.Path;
 import com.jayjaylab.androiddemo.app.greyhound.util.Constants;
 import com.jayjaylab.androiddemo.app.greyhound.util.GPXWriter;
@@ -57,6 +63,7 @@ public class ServiceRecordingPath extends RoboService implements
     // A fast frequency ceiling in milliseconds
     private static final long FASTEST_INTERVAL =
             MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
+    private final int NOTIFICATION_ID = 10001;
     final Messenger messenger = new Messenger(new IncomingHandler());
     final String GPX_FILE_EXTENSION = ".gpx";
     String DIR_PATH;
@@ -64,6 +71,7 @@ public class ServiceRecordingPath extends RoboService implements
     boolean isLocationServiceConnected;
     com.jayjaylab.androiddemo.app.greyhound.model.Path currentPath;
 
+    NotificationManagerCompat notificationManagerCompat;
     ResultReceiver resultReceiver;
     LocationClient locationClient;
     LocationRequest locationRequest;
@@ -107,6 +115,8 @@ public class ServiceRecordingPath extends RoboService implements
     @Override
     public void onCreate() {
         Ln.d("onCreate()");
+
+        notificationManagerCompat = NotificationManagerCompat.from(this);
 
 //        File[] files = ContextCompat.getExternalFilesDirs(this, null);
 //        DIR_PATH = files[0].getAbsolutePath();
@@ -245,6 +255,33 @@ public class ServiceRecordingPath extends RoboService implements
         }
     }
 
+    protected void updateNotification(int contextTextStringId) {
+        Ln.d("showNotification()");
+
+        Intent intent = new Intent(this, ActivityMain.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(ActivityMain.class);
+        stackBuilder.addNextIntent(intent);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this).
+                        setSmallIcon(R.drawable.logo_greyhound_small).
+                        setContentTitle(getString(R.string.notification_title)).
+                        setContentText(getString(contextTextStringId)).
+                        setPriority(NotificationCompat.PRIORITY_DEFAULT).
+                        setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        builder.setContentIntent(pendingIntent);
+        Notification notification = builder.build();
+        notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR;
+        notificationManagerCompat.notify(NOTIFICATION_ID, notification);
+    }
+
+    protected void dismissNotification() {
+        Ln.d("dismissNotification()");
+        notificationManagerCompat.cancel(NOTIFICATION_ID);
+    }
+
     protected class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -252,12 +289,16 @@ public class ServiceRecordingPath extends RoboService implements
 
             switch(msg.what) {
                 case Constants.MSG_START_RECORDING:
+                    updateNotification(R.string.recording_path);
                     startRecording();
                     break;
                 case Constants.MSG_PAUSE_RECORDING:
+                    // displays pause message
+                    updateNotification(R.string.pause_recording_path);
                     pauseRecording();
                     break;
                 case Constants.MSG_STOP_RECORDING:
+                    dismissNotification();
                     stopRecording();
                     stopSelf();
                     break;

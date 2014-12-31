@@ -33,6 +33,7 @@
             android:name="com.jayjaylab.androiddemo.app.greyhound.activity.ActivityMain"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_title_grey_hound"
+            android:launchMode="singleTask"
             android:parentActivityName="com.jayjaylab.androiddemo.main.activity.ActivityMain"
             android:screenOrientation="portrait" >
             <meta-data

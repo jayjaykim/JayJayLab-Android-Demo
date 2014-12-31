@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
@@ -47,6 +48,7 @@ public class ActivityMain extends ActivityBase {
     @InjectView(R.id.toolbar) Toolbar toolbar;
     @InjectView(R.id.imagebutton_recordpause) ImageButton imagebuttonRecordPause;
     @InjectView(R.id.imagebutton_stop) ImageButton imagebuttonStop;
+    @InjectView(R.id.textview_status) TextView textviewStatus;
 
     public void onCreateEvent(@Observes OnCreateEvent event) {
         setSupportActionBar(toolbar);
@@ -222,15 +224,18 @@ public class ActivityMain extends ActivityBase {
             switch(resultCode) {
                 case Constants.MSG_ONFINISH_START_RECORDING:
                     if(resultData == null) {
-
+                        textviewStatus.setText(R.string.recording);
                     } else {
                         // TODO displays error message
                         Ln.e("cannot open file due to not enough space");
                     }
                     break;
                 case Constants.MSG_ONFINISH_PAUSE_RECORDING:
+                    textviewStatus.setText(R.string.paused);
                     break;
                 case Constants.MSG_ONFINISH_STOP_RECORDING:
+                    textviewStatus.setText(R.string.done_recording);
+                    imagebuttonRecordPause.setImageResource(R.drawable.record);
                     unbindServiceIfNeed();
                     if(resultData == null) {
                         // TODO displays an error message
@@ -245,12 +250,12 @@ public class ActivityMain extends ActivityBase {
                     }
                     isPaused = true;
                     handleOnServiceDisconnected();
-                    runOnUiThread(new Runnable() {
+                    handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            imagebuttonRecordPause.setImageResource(R.drawable.record);
+                            textviewStatus.setText("");
                         }
-                    });
+                    }, 1000);
                     break;
                 case Constants.MSG_NO_GOOGLE_SERVICE:
                     break;
