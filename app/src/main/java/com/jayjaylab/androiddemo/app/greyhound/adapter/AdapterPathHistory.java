@@ -102,14 +102,21 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
                 viewHolder.layout.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        isCABActivated = true;
-                        isLongClicked = true;
-                        // activates CAB
-                        pathImpl.setSelected(!pathImpl.isSelected);
-                        countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
-                        notifyItemChanged(position);
-                        eventManager.fire(new OnLongClickEvent(viewHolder.layout, position));
-                        return false;
+                        if(isCABActivated) {
+                            pathImpl.setSelected(!pathImpl.isSelected);
+                            countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
+                            notifyItemChanged(position);
+                            eventManager.fire(new OnClickEvent(viewHolder.layout, position, TAG_CLICK_IN_SELECT_MODE));
+                        } else {
+                            isCABActivated = true;
+                            isLongClicked = true;
+                            // activates CAB
+                            pathImpl.setSelected(!pathImpl.isSelected);
+                            countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
+                            notifyItemChanged(position);
+                            eventManager.fire(new OnLongClickEvent(viewHolder.layout, position));
+                        }
+                        return true;
                     }
                 });
             }

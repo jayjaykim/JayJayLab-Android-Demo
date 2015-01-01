@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.ResultReceiver;
@@ -19,6 +20,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -69,10 +71,11 @@ public class ServiceRecordingPath extends RoboService implements
     String DIR_PATH;
 
     boolean isLocationServiceConnected;
+    boolean isRecording = false;
     com.jayjaylab.androiddemo.app.greyhound.model.Path currentPath;
 
     NotificationManagerCompat notificationManagerCompat;
-    ResultReceiver resultReceiver;
+//    ResultReceiver resultReceiver;
     LocationClient locationClient;
     LocationRequest locationRequest;
 
@@ -142,7 +145,7 @@ public class ServiceRecordingPath extends RoboService implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         Ln.d("onStartCommand()");
         if(intent != null) {
-            resultReceiver = intent.getParcelableExtra("receiver");
+//            resultReceiver = intent.getParcelableExtra("receiver");
         }
 
         checkPrecondition();
@@ -166,20 +169,45 @@ public class ServiceRecordingPath extends RoboService implements
 
     @Override
     public IBinder onBind(Intent intent) {
-        Ln.d("onBind()");
+        Ln.d("onBind() : intent : %s", intent);
         if(intent != null) {
-            resultReceiver = intent.getParcelableExtra("receiver");
+//            resultReceiver = intent.getParcelableExtra("receiver");
+//            Ln.d("onBind() : resultReceiver : %s", resultReceiver);
         }
 
         return messenger.getBinder();
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        Ln.d("onRebind() : intent : %s", intent);
+        if(intent != null) {
+//            resultReceiver = intent.getParcelableExtra("receiver");
+//            Ln.d("onRebind() : resultReceiver : %s", resultReceiver);
+        }
+
+        super.onRebind(intent);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Ln.d("onUnbind() : intent : %s", intent);
+//        resultReceiver = null;
+
+        super.onUnbind(intent);
+        return true;
     }
 
     protected void checkPrecondition() {
         Ln.d("checkPrecondition()");
 
         if(!servicesConnected()) {
-            if(resultReceiver != null)
-                resultReceiver.send(Constants.MSG_NO_GOOGLE_SERVICE, null);
+//            if(resultReceiver != null)
+//                resultReceiver.send(Constants.MSG_NO_GOOGLE_SERVICE, null);
+            Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+            intent.putExtra("resultCode", Constants.MSG_NO_GOOGLE_SERVICE);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
             stopSelf();
         }
     }
@@ -212,6 +240,7 @@ public class ServiceRecordingPath extends RoboService implements
     protected void startRecording() {
         Ln.d("startRecording()");
 
+        isRecording = true;
         currentPath = new Path();
         currentPath.getPathEntity().setStartTime(new DateTime().toString());
         Ln.d("startRecording() : currentPath : %s", currentPath);
@@ -220,25 +249,40 @@ public class ServiceRecordingPath extends RoboService implements
             if(!opened) {
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("result", false);
-                resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, bundle);
+//                resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, bundle);
+
+                Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+                intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
+                intent.putExtra("resultData", bundle);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+                isRecording = false;
                 return;
             }
         }
         currentPath.getPathEntity().setGpxPath(gpxWriter.getAbsolutePath());
         locationClient.requestLocationUpdates(locationRequest, ServiceRecordingPath.this);
-        resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, null);
+//        resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, null);
+        Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+        intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     protected void pauseRecording() {
         Ln.d("pauseRecording()");
 
+        isRecording = false;
         locationClient.removeLocationUpdates(ServiceRecordingPath.this);
-        resultReceiver.send(Constants.MSG_ONFINISH_PAUSE_RECORDING, null);
+//        resultReceiver.send(Constants.MSG_ONFINISH_PAUSE_RECORDING, null);
+        Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+        intent.putExtra("resultCode", Constants.MSG_ONFINISH_PAUSE_RECORDING);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     protected void stopRecording() {
         Ln.d("stopRecording()");
 
+        isRecording = false;
         if(currentPath != null) {
             locationClient.removeLocationUpdates(ServiceRecordingPath.this);
             currentPath.getPathEntity().setEndTime(new DateTime().toString());
@@ -249,20 +293,24 @@ public class ServiceRecordingPath extends RoboService implements
             // recorded path. e.g. storing it in database to show it in UI.
             Bundle bundle = new Bundle();
             bundle.putParcelable("path", currentPath);
-            resultReceiver.send(Constants.MSG_ONFINISH_STOP_RECORDING, bundle);
+//            resultReceiver.send(Constants.MSG_ONFINISH_STOP_RECORDING, bundle);
+            Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+            intent.putExtra("resultCode", Constants.MSG_ONFINISH_STOP_RECORDING);
+            intent.putExtra("resultData", bundle);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
             currentPath = null;
         }
     }
 
     protected void updateNotification(int contextTextStringId) {
-        Ln.d("showNotification()");
+        Ln.d("updateNotification()");
 
         Intent intent = new Intent(this, ActivityMain.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(ActivityMain.class);
         stackBuilder.addNextIntent(intent);
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(NOTIFICATION_ID, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this).
@@ -270,8 +318,9 @@ public class ServiceRecordingPath extends RoboService implements
                         setContentTitle(getString(R.string.notification_title)).
                         setContentText(getString(contextTextStringId)).
                         setPriority(NotificationCompat.PRIORITY_DEFAULT).
-                        setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        builder.setContentIntent(pendingIntent);
+                        setVisibility(NotificationCompat.VISIBILITY_PUBLIC).
+                        setWhen(System.currentTimeMillis()).
+                        setContentIntent(pendingIntent);
         Notification notification = builder.build();
         notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_NO_CLEAR;
         notificationManagerCompat.notify(NOTIFICATION_ID, notification);
@@ -282,10 +331,14 @@ public class ServiceRecordingPath extends RoboService implements
         notificationManagerCompat.cancel(NOTIFICATION_ID);
     }
 
+    protected boolean isRecording() {
+        return isRecording;
+    }
+
     protected class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            Ln.d("handleMessage() : msg : %s", msg);
+//            Ln.d("handleMessage() : msg : %s, resultReceiver : %s", msg, resultReceiver);
 
             switch(msg.what) {
                 case Constants.MSG_START_RECORDING:
@@ -301,6 +354,17 @@ public class ServiceRecordingPath extends RoboService implements
                     dismissNotification();
                     stopRecording();
                     stopSelf();
+                    break;
+                case Constants.MSG_ASK_RECORDING_STATUS:
+//                    if(resultReceiver != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("isRecording", isRecording());
+//                        resultReceiver.send(Constants.MSG_ONFINISH_ASK_RECORDING_STATUS, bundle);
+                    Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+                    intent.putExtra("resultCode", Constants.MSG_ONFINISH_ASK_RECORDING_STATUS);
+                    intent.putExtra("resultData", bundle);
+                    LocalBroadcastManager.getInstance(ServiceRecordingPath.this).sendBroadcast(intent);
+//                    }
                     break;
                 default:
                     super.handleMessage(msg);

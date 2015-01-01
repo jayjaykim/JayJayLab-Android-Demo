@@ -1,35 +1,42 @@
 package com.jayjaylab.androiddemo.app.greyhound.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.ResultReceiver;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
+import com.jayjaylab.androiddemo.app.greyhound.event.OnReceiveResultEvent;
 import com.jayjaylab.androiddemo.app.greyhound.fragment.FragmentPathHistory;
 import com.jayjaylab.androiddemo.app.greyhound.service.ServiceRecordingPath;
 import com.jayjaylab.androiddemo.app.greyhound.util.Constants;
+import com.jayjaylab.androiddemo.app.greyhound.util.MyResultReceiver;
 import com.jayjaylab.androiddemo.main.activity.ActivityBase;
 import com.jayjaylab.androiddemo.util.AndroidHelper;
 
-import roboguice.activity.RoboActionBarActivity;
 import roboguice.context.event.OnCreateEvent;
+import roboguice.context.event.OnDestroyEvent;
 import roboguice.event.Observes;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import roboguice.receiver.RoboBroadcastReceiver;
 import roboguice.util.Ln;
 
 @ContentView(R.layout.activity_greyhound_main)
@@ -43,6 +50,7 @@ public class ActivityMain extends ActivityBase {
     @Inject Handler handler;
     @Inject FragmentPathHistory fragmentPathHistory;
     @Inject ServiceRecordingPath serviceRecordingPath;
+//    @Inject MyResultReceiver resultReceiver;
 
     // views
     @InjectView(R.id.toolbar) Toolbar toolbar;
@@ -50,19 +58,144 @@ public class ActivityMain extends ActivityBase {
     @InjectView(R.id.imagebutton_stop) ImageButton imagebuttonStop;
     @InjectView(R.id.textview_status) TextView textviewStatus;
 
-    public void onCreateEvent(@Observes OnCreateEvent event) {
+    protected void onCreateEvent(@Observes OnCreateEvent event) {
+        Ln.d("onCreateEvent() : event : %s, context : %s", event, this);
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
+                new IntentFilter(Constants.INTENT_FILTER_TAG));
 
         loadPathHistoryFragment();
         setViews();
+        checkServiceRecordingPath();
+    }
+
+    protected void onDestroyEvent(@Observes OnDestroyEvent event) {
+        Ln.d("onDestroyEvent() : event : %s", event);
+
+        try {
+            unbindService(connection);
+        } catch(Exception e) {
+            Ln.e(e);
+        }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+    }
+
+    @Deprecated
+    /**
+     * @hide because ResultReceiver approach doesn't work as expected. BroadcastReceiver approach
+     * is chosen for IPC from service to activity.
+     */
+    protected void onReceiveResultEvent(@Observes OnReceiveResultEvent event) {
+        Ln.d("onReceiveResultEvent() : event : %s", event);
+        final int resultCode = event.getResultCode();
+        final Bundle resultData = event.getResultData();
+
+        switch(resultCode) {
+            case Constants.MSG_ONFINISH_START_RECORDING:
+                if(resultData == null) {
+                    textviewStatus.setText(R.string.recording);
+                } else {
+                    // TODO displays error message
+                    Ln.e("cannot open file due to not enough space");
+                }
+                break;
+            case Constants.MSG_ONFINISH_PAUSE_RECORDING:
+                textviewStatus.setText(R.string.paused);
+                break;
+            case Constants.MSG_ONFINISH_STOP_RECORDING:
+                textviewStatus.setText(R.string.done_recording);
+                imagebuttonRecordPause.setImageResource(R.drawable.record);
+                unbindServiceIfNeed();
+                if(resultData == null) {
+                    // TODO displays an error message
+                } else {
+                    // stores the result in db
+                    FragmentPathHistory fragmentPathHistory = (FragmentPathHistory)
+                            getSupportFragmentManager().findFragmentByTag(
+                                    FragmentPathHistory.TAG);
+                    fragmentPathHistory.addPath(
+                            (com.jayjaylab.androiddemo.app.greyhound.model.Path)
+                                    resultData.getParcelable("path"));
+                }
+                isPaused = true;
+                handleOnServiceDisconnected();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        textviewStatus.setText("");
+                    }
+                }, 1000);
+                break;
+            case Constants.MSG_NO_GOOGLE_SERVICE:
+                break;
+            case Constants.MSG_ONFINISH_ASK_RECORDING_STATUS:
+                Ln.d("onReceiveResult() : context : %s", ActivityMain.this);
+                if(resultData == null) {
+                    // TODO what else should be done?
+                } else {
+                    if(resultData.getBoolean("isRecording")) {
+                        Ln.d("333");
+                        isPaused = false;
+                        textviewStatus.setText(R.string.recording);
+                        imagebuttonRecordPause.setImageResource(R.drawable.pause);
+                    } else {
+                        Ln.d("444");
+                        isPaused = true;
+                        textviewStatus.setText(R.string.paused);
+                        imagebuttonRecordPause.setImageResource(R.drawable.record);
+                    }
+                }
+                enableButtons(true);
+                break;
+        }
     }
 
     protected void setViews() {
         setToolbar();
         setImageButtonRecordPause();
         setImageButtonStop();
+    }
+
+    protected void checkServiceRecordingPath() {
+        Ln.d("checkServiceRecordingPath()");
+
+        if(AndroidHelper.isServiceRunning(this, ServiceRecordingPath.class)) {
+            Ln.d("checkServiceRecordingPath() : disabled buttons and bind to the service...");
+            // because the service is now running, the service doesn't need to be started again.
+            enableButtons(false);
+            bindServiceIfNeeded();
+
+            if(serviceMessenger == null) {
+                messegeToBeSentOnceConnected =
+                        Message.obtain(null, Constants.MSG_ASK_RECORDING_STATUS, 0, 0);
+            } else {
+                Message msg = Message.obtain(null, Constants.MSG_ASK_RECORDING_STATUS, 0, 0);
+                try {
+                    serviceMessenger.send(msg);
+                } catch(RemoteException e) {
+                    Ln.e(e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Enables or disables buttons
+     * @param enabled   true to enable buttons, false to disable buttons
+     */
+    protected void enableButtons(boolean enabled) {
+        Ln.d("enableButtons() : enabled : %b", enabled);
+
+        if(enabled) {
+            imagebuttonRecordPause.setEnabled(true);
+            imagebuttonStop.setEnabled(true);
+        } else {
+            imagebuttonRecordPause.setEnabled(false);
+            imagebuttonStop.setEnabled(false);
+        }
     }
 
     protected void setToolbar() {
@@ -99,7 +232,7 @@ public class ActivityMain extends ActivityBase {
             @Override
             public void onClick(View v) {
 //                if(!isPaused) {
-                  stopRecording();
+                stopRecording();
 //                }
             }
         });
@@ -107,7 +240,7 @@ public class ActivityMain extends ActivityBase {
 
     protected void startRecording() {
         startRecordingPathServiceIfNeeded();
-        bindServiceIfNeed();
+        bindServiceIfNeeded();
 
 
         if(serviceMessenger == null) {
@@ -125,7 +258,7 @@ public class ActivityMain extends ActivityBase {
 
     protected void pauseRecording() {
         startRecordingPathServiceIfNeeded();
-        bindServiceIfNeed();
+        bindServiceIfNeeded();
 
         if(serviceMessenger == null) {
             messegeToBeSentOnceConnected =
@@ -142,7 +275,7 @@ public class ActivityMain extends ActivityBase {
 
     protected void stopRecording() {
         startRecordingPathServiceIfNeeded();
-        bindServiceIfNeed();
+        bindServiceIfNeeded();
 
         if(serviceMessenger == null) {
             messegeToBeSentOnceConnected =
@@ -162,17 +295,21 @@ public class ActivityMain extends ActivityBase {
 
         if(!AndroidHelper.isServiceRunning(this, ServiceRecordingPath.class)) {
             Intent intent = new Intent(this, ServiceRecordingPath.class);
-            intent.putExtra("receiver", resultReceiver);
+//            intent.putExtra("receiver", resultReceiver.getResultReceiver());
             startService(intent);
             Ln.d("startRecordingPathServiceIfNeeded() : service gets started...");
         }
     }
 
-    protected void bindServiceIfNeed() {
+    protected void bindServiceIfNeeded() {
+        Ln.d("bindServiceIfNeeded() : isBound : %b", isBound);
+
         if(!isBound) {
             Intent intent = new Intent(this, ServiceRecordingPath.class);
-            intent.putExtra("receiver", resultReceiver);
+//            intent.putExtra("receiver", resultReceiver.getResultReceiver());
             bindService(intent, connection, 0);
+
+//            Ln.d("bindServiceIfNeeded() : resultReceiver : %s", resultReceiver);
         }
     }
 
@@ -217,10 +354,12 @@ public class ActivityMain extends ActivityBase {
         isBound = false;
     }
 
-    protected ResultReceiver resultReceiver = new ResultReceiver(handler) {
+    protected RoboBroadcastReceiver broadcastReceiver = new RoboBroadcastReceiver() {
         @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-            Ln.d("onReceiveResult() : resultCode : %d, resultData : %s", resultCode, resultData);
+        protected void handleReceive(Context context, Intent intent) {
+            final int resultCode = intent.getIntExtra("resultCode", -1);
+            final Bundle resultData = intent.getBundleExtra("resultData");
+
             switch(resultCode) {
                 case Constants.MSG_ONFINISH_START_RECORDING:
                     if(resultData == null) {
@@ -259,9 +398,92 @@ public class ActivityMain extends ActivityBase {
                     break;
                 case Constants.MSG_NO_GOOGLE_SERVICE:
                     break;
+                case Constants.MSG_ONFINISH_ASK_RECORDING_STATUS:
+                    Ln.d("onReceiveResult() : context : %s", ActivityMain.this);
+                    if(resultData == null) {
+                        // TODO what else should be done?
+                    } else {
+                        if(resultData.getBoolean("isRecording")) {
+                            Ln.d("333");
+                            isPaused = false;
+                            textviewStatus.setText(R.string.recording);
+                            imagebuttonRecordPause.setImageResource(R.drawable.pause);
+                        } else {
+                            Ln.d("444");
+                            isPaused = true;
+                            textviewStatus.setText(R.string.paused);
+                            imagebuttonRecordPause.setImageResource(R.drawable.record);
+                        }
+                    }
+                    enableButtons(true);
+                    break;
             }
-
-            super.onReceiveResult(resultCode, resultData);
         }
     };
+
+//    protected ResultReceiver resultReceiver = new ResultReceiver(handler) {
+//        @Override
+//        protected void onReceiveResult(int resultCode, Bundle resultData) {
+//            Ln.d("onReceiveResult() : resultCode : %d, resultData : %s, resultReceiver : %s",
+//                    resultCode, resultData, resultReceiver);
+//            switch(resultCode) {
+//                case Constants.MSG_ONFINISH_START_RECORDING:
+//                    if(resultData == null) {
+//                        textviewStatus.setText(R.string.recording);
+//                    } else {
+//                        // TODO displays error message
+//                        Ln.e("cannot open file due to not enough space");
+//                    }
+//                    break;
+//                case Constants.MSG_ONFINISH_PAUSE_RECORDING:
+//                    textviewStatus.setText(R.string.paused);
+//                    break;
+//                case Constants.MSG_ONFINISH_STOP_RECORDING:
+//                    textviewStatus.setText(R.string.done_recording);
+//                    imagebuttonRecordPause.setImageResource(R.drawable.record);
+//                    unbindServiceIfNeed();
+//                    if(resultData == null) {
+//                        // TODO displays an error message
+//                    } else {
+//                        // stores the result in db
+//                        FragmentPathHistory fragmentPathHistory = (FragmentPathHistory)
+//                                getSupportFragmentManager().findFragmentByTag(
+//                                        FragmentPathHistory.TAG);
+//                        fragmentPathHistory.addPath(
+//                                (com.jayjaylab.androiddemo.app.greyhound.model.Path)
+//                                        resultData.getParcelable("path"));
+//                    }
+//                    isPaused = true;
+//                    handleOnServiceDisconnected();
+//                    handler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            textviewStatus.setText("");
+//                        }
+//                    }, 1000);
+//                    break;
+//                case Constants.MSG_NO_GOOGLE_SERVICE:
+//                    break;
+//                case Constants.MSG_ONFINISH_ASK_RECORDING_STATUS:
+//                    Ln.d("onReceiveResult() : context : %s", ActivityMain.this);
+//                    if(resultData == null) {
+//                        // TODO what else should be done?
+//                    } else {
+//                        if(resultData.getBoolean("isRecording")) {
+//                            Ln.d("333");
+//                            isPaused = false;
+//                            textviewStatus.setText(R.string.recording);
+//                            imagebuttonRecordPause.setImageResource(R.drawable.pause);
+//                        } else {
+//                            Ln.d("444");
+//                            isPaused = true;
+//                            textviewStatus.setText(R.string.paused);
+//                            imagebuttonRecordPause.setImageResource(R.drawable.record);
+//                        }
+//                    }
+//                    enableButtons(true);
+//                    break;
+//            }
+//        }
+//    };
 }

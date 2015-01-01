@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -231,7 +232,7 @@ public class FragmentPathHistory extends RoboFragment {
         protected void onActivityDestroy(@Observes OnDestroyEvent event) {
             Ln.d("Killing background thread %s", this);
             if(event.getContext() == getActivity()) {
-                cancel(true);
+//                cancel(true);
             }
         }
 
@@ -300,7 +301,7 @@ public class FragmentPathHistory extends RoboFragment {
         protected void onActivityDestroy(@Observes OnDestroyEvent event) {
             Ln.d("Killing background thread %s", this);
             if(event.getContext() == getActivity()) {
-                cancel(true);
+//                cancel(true);
             }
         }
     }

@@ -27,6 +27,13 @@ public class AndroidHelper {
         }
     }
 
+    /**
+     * Returns true if <var>serviceClass</var> is running for the moment, false otherwise.
+     *
+     * @param context   an instance of Context class
+     * @param serviceClass  class instance
+     * @return Returns true if <var>serviceClass</var> is running for the moment, false otherwise.
+     */
     public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {

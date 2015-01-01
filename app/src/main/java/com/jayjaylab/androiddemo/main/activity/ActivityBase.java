@@ -14,6 +14,7 @@ import roboguice.util.Ln;
  * Created by jongjoo on 12/30/14.
  */
 public class ActivityBase extends RoboActionBarActivity {
+    @SuppressWarnings("unused")
     protected void handleProgressBarEvent(@Observes ProgressBarEvent event) {
         Ln.d("handleProgressBarEvent() : event : %s", event);
 
