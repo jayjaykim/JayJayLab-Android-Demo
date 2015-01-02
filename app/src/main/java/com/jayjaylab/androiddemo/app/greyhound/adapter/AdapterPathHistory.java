@@ -1,5 +1,6 @@
 package com.jayjaylab.androiddemo.app.greyhound.adapter;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import roboguice.util.Ln;
  * Created by jongjoo on 11/22/14.
  */
 public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.ViewHolder> {
+    public static String TAG_CLICK_IN_NORMAL_MODE = "clicked_normal_mode";
     public static String TAG_CLICK_IN_SELECT_MODE = "clicked_select_mode";
     public static String TAG_CLICK_LOAD_MORE = "clicked_load_more";
 
@@ -91,11 +93,13 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
                             return;
                         }
 
-                        if (isCABActivated) {
+                        if(isCABActivated) {
                             pathImpl.setSelected(!pathImpl.isSelected);
                             countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
                             notifyItemChanged(position);
                             eventManager.fire(new OnClickEvent(viewHolder.layout, position, TAG_CLICK_IN_SELECT_MODE));
+                        } else {
+                            eventManager.fire(new OnClickEvent(viewHolder.layout, position, TAG_CLICK_IN_NORMAL_MODE));
                         }
                     }
                 });

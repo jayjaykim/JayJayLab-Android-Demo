@@ -1,10 +1,12 @@
 package com.jayjaylab.androiddemo.app.greyhound.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -23,6 +25,7 @@ import com.jayjaylab.androiddemo.DaoSession;
 import com.jayjaylab.androiddemo.Path;
 import com.jayjaylab.androiddemo.PathDao;
 import com.jayjaylab.androiddemo.R;
+import com.jayjaylab.androiddemo.app.greyhound.activity.ActivityMap;
 import com.jayjaylab.androiddemo.app.greyhound.adapter.AdapterPathHistory;
 import com.jayjaylab.androiddemo.event.OnClickEvent;
 import com.jayjaylab.androiddemo.event.OnLongClickEvent;
@@ -86,6 +89,9 @@ public class FragmentPathHistory extends RoboFragment {
                 loadTenPaths(adapter.getSmallestId());
             } else if(event.getTag().equals(AdapterPathHistory.TAG_CLICK_IN_SELECT_MODE)) {
 
+            } else if(event.getTag().equals(AdapterPathHistory.TAG_CLICK_IN_NORMAL_MODE)) {
+                Intent intent = new Intent(getActivity(), ActivityMap.class);
+                ActivityCompat.startActivity(getActivity(), intent, null);
             }
         } else {
             if(event.getTag().equals(AdapterPathHistory.TAG_CLICK_LOAD_MORE)) {
