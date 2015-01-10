@@ -1,6 +1,5 @@
 package com.jayjaylab.androiddemo.app.greyhound.adapter;
 
-import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,7 +35,7 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
     public static String TAG_CLICK_IN_SELECT_MODE = "clicked_select_mode";
     public static String TAG_CLICK_LOAD_MORE = "clicked_load_more";
 
-    List<PathImpl> items = new ArrayList<PathImpl>(20);
+    List<PathWrapper> items = new ArrayList<PathWrapper>(20);
     DateTimeFormatter fmt;
     ReadWriteLock readWriteLock;
 
@@ -56,11 +55,11 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         readWriteLock.readLock().lock();
-        final PathImpl pathImpl = items.get(position);
+        final PathWrapper pathWrapper = items.get(position);
         readWriteLock.readLock().unlock();
 
-        if(pathImpl != null) {
-            if(pathImpl.getPath() == null) {
+        if(pathWrapper != null) {
+            if(pathWrapper.getPath() == null) {
                 viewHolder.layoutContent.setVisibility(View.INVISIBLE);
                 viewHolder.layoutNext.setVisibility(View.VISIBLE);
 
@@ -75,11 +74,11 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
                 viewHolder.layoutContent.setVisibility(View.VISIBLE);
                 viewHolder.layoutNext.setVisibility(View.INVISIBLE);
 
-                DateTime startDatetime = DateTime.parse(pathImpl.getPath().getStartTime());
-                DateTime endDatetime = DateTime.parse(pathImpl.getPath().getEndTime());
+                DateTime startDatetime = DateTime.parse(pathWrapper.getPath().getStartTime());
+                DateTime endDatetime = DateTime.parse(pathWrapper.getPath().getEndTime());
                 viewHolder.textviewDateTime.setText(fmt.print(startDatetime));
                 viewHolder.textviewPathInfo.setText(fmt.print(endDatetime));
-                if (pathImpl.isSelected()) {
+                if (pathWrapper.isSelected()) {
                     viewHolder.layout.setBackgroundResource(R.color.background_collection_selected);
                 } else {
                     viewHolder.layout.setBackgroundResource(R.drawable.selector_gridcell_mainapp);
@@ -94,8 +93,8 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
                         }
 
                         if(isCABActivated) {
-                            pathImpl.setSelected(!pathImpl.isSelected);
-                            countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
+                            pathWrapper.setSelected(!pathWrapper.isSelected);
+                            countSelected = pathWrapper.isSelected() ? countSelected + 1 : countSelected - 1;
                             notifyItemChanged(position);
                             eventManager.fire(new OnClickEvent(viewHolder.layout, position, TAG_CLICK_IN_SELECT_MODE));
                         } else {
@@ -107,16 +106,16 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
                     @Override
                     public boolean onLongClick(View v) {
                         if(isCABActivated) {
-                            pathImpl.setSelected(!pathImpl.isSelected);
-                            countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
+                            pathWrapper.setSelected(!pathWrapper.isSelected);
+                            countSelected = pathWrapper.isSelected() ? countSelected + 1 : countSelected - 1;
                             notifyItemChanged(position);
                             eventManager.fire(new OnClickEvent(viewHolder.layout, position, TAG_CLICK_IN_SELECT_MODE));
                         } else {
                             isCABActivated = true;
                             isLongClicked = true;
                             // activates CAB
-                            pathImpl.setSelected(!pathImpl.isSelected);
-                            countSelected = pathImpl.isSelected() ? countSelected + 1 : countSelected - 1;
+                            pathWrapper.setSelected(!pathWrapper.isSelected);
+                            countSelected = pathWrapper.isSelected() ? countSelected + 1 : countSelected - 1;
                             notifyItemChanged(position);
                             eventManager.fire(new OnLongClickEvent(viewHolder.layout, position));
                         }
@@ -165,10 +164,10 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
 
         final int sizePrev = items.size();
         final int sizePost = sizePrev + paths.size();
-        ArrayList<PathImpl> list = new ArrayList<PathImpl>(paths.size());
+        ArrayList<PathWrapper> list = new ArrayList<PathWrapper>(paths.size());
         for(Path path : paths) {
             Ln.d("addItems() : path.id : %d", path.getId());
-            list.add(PathImpl.createPathImpl(path));
+            list.add(PathWrapper.createPathImpl(path));
         }
 
         items.addAll(list);
@@ -188,8 +187,8 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         if(size == 0)
             return;
 
-        PathImpl pathImpl = items.get(size - 1);
-        if(pathImpl.getPath() == null) {
+        PathWrapper pathWrapper = items.get(size - 1);
+        if(pathWrapper.getPath() == null) {
             items.remove(items.size() - 1);
             notifyItemRemoved(size - 1);
         }
@@ -200,7 +199,7 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         if(paths.size() == 0)
             return;
 
-        items.add(new PathImpl(null, false));
+        items.add(new PathWrapper(null, false));
         notifyItemInserted(items.size() - 1);
     }
 
@@ -215,7 +214,7 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
             @Override
             public void run() {
                 readWriteLock.writeLock().lock();
-                items.add(0, PathImpl.createPathImpl(path));
+                items.add(0, PathWrapper.createPathImpl(path));
                 notifyItemInserted(0);
 //                notifyDataSetChanged();
                 readWriteLock.writeLock().unlock();
@@ -227,21 +226,21 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         Ln.d("getSmallestId()");
 
         final int size = items.size();
-        PathImpl pathImpl = null;
+        PathWrapper pathWrapper = null;
         for(int i = size - 1; i >= 0; i--) {
-            pathImpl = getItem(i);
-            if(pathImpl.getPath() != null) {
-                return pathImpl.getPath().getId();
+            pathWrapper = getItem(i);
+            if(pathWrapper.getPath() != null) {
+                return pathWrapper.getPath().getId();
             }
         }
 
         return -1;
     }
 
-    public List<PathImpl> getSelectedItems() {
-        ArrayList<PathImpl> list = new ArrayList<PathImpl>(10);
+    public List<PathWrapper> getSelectedItems() {
+        ArrayList<PathWrapper> list = new ArrayList<PathWrapper>(10);
 
-        for(PathImpl path : items) {
+        for(PathWrapper path : items) {
             if(path.isSelected) {
                 list.add(path);
             }
@@ -250,11 +249,11 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         return list;
     }
 
-    public void removeItem(final PathImpl pathImpl) {
+    public void removeItem(final PathWrapper pathWrapper) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                final int index = items.indexOf(pathImpl);
+                final int index = items.indexOf(pathWrapper);
                 items.remove(index);
                 notifyItemRemoved(index);
             }
@@ -266,7 +265,7 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
 
         countSelected = 0;
         isCABActivated = false;
-        for(PathImpl path : items) {
+        for(PathWrapper path : items) {
             path.setSelected(false);
         }
 
@@ -277,7 +276,7 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         return countSelected;
     }
 
-    public PathImpl getItem(int position) {
+    public PathWrapper getItem(int position) {
         return items.get(position);
     }
 
@@ -294,11 +293,11 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
         }
     }
 
-    public static class PathImpl {
+    public static class PathWrapper {
         boolean isSelected;
         Path path;
 
-        private PathImpl(Path path, boolean isSelected) {
+        private PathWrapper(Path path, boolean isSelected) {
             this.path = path;
             this.isSelected = isSelected;
         }
@@ -319,8 +318,8 @@ public class AdapterPathHistory extends RecyclerView.Adapter<AdapterPathHistory.
             this.path = path;
         }
 
-        public static PathImpl createPathImpl(Path path) {
-            return new PathImpl(path, false);
+        public static PathWrapper createPathImpl(Path path) {
+            return new PathWrapper(path, false);
         }
     }
 }

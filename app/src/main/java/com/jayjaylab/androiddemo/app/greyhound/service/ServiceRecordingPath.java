@@ -27,9 +27,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.inject.Inject;
 import com.jayjaylab.androiddemo.R;
 import com.jayjaylab.androiddemo.app.greyhound.activity.ActivityMain;
@@ -49,8 +50,8 @@ import roboguice.service.RoboService;
 import roboguice.util.Ln;
 
 public class ServiceRecordingPath extends RoboService implements
-    GooglePlayServicesClient.ConnectionCallbacks,
-    GooglePlayServicesClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
     LocationListener {
     final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     // Milliseconds per second
@@ -76,7 +77,7 @@ public class ServiceRecordingPath extends RoboService implements
 
     NotificationManagerCompat notificationManagerCompat;
 //    ResultReceiver resultReceiver;
-    LocationClient locationClient;
+    GoogleApiClient googleApiClient;
     LocationRequest locationRequest;
 
     @Inject GPXWriter gpxWriter;
@@ -88,8 +89,9 @@ public class ServiceRecordingPath extends RoboService implements
     }
 
     @Override
-    public void onDisconnected() {
-        Ln.d("onDisconnected()");
+    public void onConnectionSuspended(int i) {
+        Ln.d("onConnectionSuspended() : i : %d", i);
+
         isLocationServiceConnected = false;
     }
 
@@ -128,8 +130,12 @@ public class ServiceRecordingPath extends RoboService implements
 
 //        recordingState = RECORDING_STATE.IDLE;
         setLocationRequest();
-        locationClient = new LocationClient(this, this, this);
-        locationClient.connect();
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        googleApiClient.connect();
 
         super.onCreate();
     }
@@ -261,7 +267,8 @@ public class ServiceRecordingPath extends RoboService implements
             }
         }
         currentPath.getPathEntity().setGpxPath(gpxWriter.getAbsolutePath());
-        locationClient.requestLocationUpdates(locationRequest, ServiceRecordingPath.this);
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                googleApiClient, locationRequest, ServiceRecordingPath.this);
 //        resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, null);
         Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
         intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
@@ -272,7 +279,7 @@ public class ServiceRecordingPath extends RoboService implements
         Ln.d("pauseRecording()");
 
         isRecording = false;
-        locationClient.removeLocationUpdates(ServiceRecordingPath.this);
+        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, ServiceRecordingPath.this);
 //        resultReceiver.send(Constants.MSG_ONFINISH_PAUSE_RECORDING, null);
         Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
         intent.putExtra("resultCode", Constants.MSG_ONFINISH_PAUSE_RECORDING);
@@ -284,7 +291,8 @@ public class ServiceRecordingPath extends RoboService implements
 
         isRecording = false;
         if(currentPath != null) {
-            locationClient.removeLocationUpdates(ServiceRecordingPath.this);
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, ServiceRecordingPath.this);
+            googleApiClient.disconnect();
             currentPath.getPathEntity().setEndTime(new DateTime().toString());
             Ln.d("stopRecording() : currentPath : %s", currentPath);
             gpxWriter.closeFile();

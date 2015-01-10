@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -91,6 +89,7 @@ public class FragmentPathHistory extends RoboFragment {
 
             } else if(event.getTag().equals(AdapterPathHistory.TAG_CLICK_IN_NORMAL_MODE)) {
                 Intent intent = new Intent(getActivity(), ActivityMap.class);
+                intent.putExtra("gpxFilePath", adapter.getItem(event.getWhich()).getPath().getGpxPath());
                 ActivityCompat.startActivity(getActivity(), intent, null);
             }
         } else {
@@ -207,9 +206,9 @@ public class FragmentPathHistory extends RoboFragment {
 
         @Override
         public Void call() throws Exception {
-            List<AdapterPathHistory.PathImpl> pathImplList = adapter.getSelectedItems();
+            List<AdapterPathHistory.PathWrapper> pathWrapperList = adapter.getSelectedItems();
             File file = null;
-            for(AdapterPathHistory.PathImpl path : pathImplList) {
+            for(AdapterPathHistory.PathWrapper path : pathWrapperList) {
                 file = new File(path.getPath().getGpxPath());
                 file.delete();
                 adapter.removeItem(path);
