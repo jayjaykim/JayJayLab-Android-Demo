@@ -4,7 +4,6 @@ package com.jayjaylab.androiddemo.app.greyhound.util;
  * Created by jongjoo on 11/28/14.
  */
 public class Constants {
-
     public static final String INTENT_FILTER_TAG = "com.jayjaylab.androiddemo.app.greyhound.TAG_SERVICE2ACTIVITY_PATH_RECORDING";
 
     // message ids sent from activity to service

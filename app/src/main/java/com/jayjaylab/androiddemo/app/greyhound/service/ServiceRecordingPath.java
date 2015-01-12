@@ -37,6 +37,7 @@ import com.jayjaylab.androiddemo.app.greyhound.activity.ActivityMain;
 import com.jayjaylab.androiddemo.app.greyhound.model.Path;
 import com.jayjaylab.androiddemo.app.greyhound.util.Constants;
 import com.jayjaylab.androiddemo.app.greyhound.util.GPXWriter;
+import com.jayjaylab.androiddemo.app.greyhound.util.PreferenceHelper;
 import com.jayjaylab.androiddemo.util.AndroidHelper;
 
 import org.joda.time.DateTime;
@@ -72,7 +73,7 @@ public class ServiceRecordingPath extends RoboService implements
     String DIR_PATH;
 
     boolean isLocationServiceConnected;
-    boolean isRecording = false;
+//    boolean isRecording = false;
     com.jayjaylab.androiddemo.app.greyhound.model.Path currentPath;
 
     NotificationManagerCompat notificationManagerCompat;
@@ -155,6 +156,7 @@ public class ServiceRecordingPath extends RoboService implements
         }
 
         checkPrecondition();
+        resumeRecordingIfStoppedUnexpectedly();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -204,6 +206,12 @@ public class ServiceRecordingPath extends RoboService implements
         return true;
     }
 
+    protected void resumeRecordingIfStoppedUnexpectedly() {
+        Ln.d("resumeRecordingIfStoppedUnexpectedly()");
+        // TODO if in recording or paused state, recover the previous state
+
+    }
+
     protected void checkPrecondition() {
         Ln.d("checkPrecondition()");
 
@@ -246,7 +254,7 @@ public class ServiceRecordingPath extends RoboService implements
     protected void startRecording() {
         Ln.d("startRecording()");
 
-        isRecording = true;
+//        isRecording = true;
         currentPath = new Path();
         currentPath.getPathEntity().setStartTime(new DateTime().toString());
         Ln.d("startRecording() : currentPath : %s", currentPath);
@@ -262,13 +270,15 @@ public class ServiceRecordingPath extends RoboService implements
                 intent.putExtra("resultData", bundle);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-                isRecording = false;
+//                isRecording = false;
                 return;
             }
         }
         currentPath.getPathEntity().setGpxPath(gpxWriter.getAbsolutePath());
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 googleApiClient, locationRequest, ServiceRecordingPath.this);
+        PreferenceHelper.setGpxFilePath(this, gpxWriter.getAbsolutePath());
+        PreferenceHelper.setLocationRecordingState(this, PreferenceHelper.RECORDING_STATE_RECORDING);
 //        resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, null);
         Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
         intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
@@ -278,8 +288,9 @@ public class ServiceRecordingPath extends RoboService implements
     protected void pauseRecording() {
         Ln.d("pauseRecording()");
 
-        isRecording = false;
+//        isRecording = false;
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, ServiceRecordingPath.this);
+        PreferenceHelper.setLocationRecordingState(this, PreferenceHelper.RECORDING_STATE_PAUSED);
 //        resultReceiver.send(Constants.MSG_ONFINISH_PAUSE_RECORDING, null);
         Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
         intent.putExtra("resultCode", Constants.MSG_ONFINISH_PAUSE_RECORDING);
@@ -289,7 +300,9 @@ public class ServiceRecordingPath extends RoboService implements
     protected void stopRecording() {
         Ln.d("stopRecording()");
 
-        isRecording = false;
+//        isRecording = false;
+        PreferenceHelper.setGpxFilePath(this, null);
+        PreferenceHelper.setLocationRecordingState(this, PreferenceHelper.RECORDING_STATE_STOPPED);
         if(currentPath != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, ServiceRecordingPath.this);
             googleApiClient.disconnect();
@@ -339,8 +352,8 @@ public class ServiceRecordingPath extends RoboService implements
         notificationManagerCompat.cancel(NOTIFICATION_ID);
     }
 
-    protected boolean isRecording() {
-        return isRecording;
+    protected int getRecordingState() {
+        return PreferenceHelper.getLocationRecordingState(this);
     }
 
     protected class IncomingHandler extends Handler {
@@ -366,7 +379,7 @@ public class ServiceRecordingPath extends RoboService implements
                 case Constants.MSG_ASK_RECORDING_STATUS:
 //                    if(resultReceiver != null) {
                     Bundle bundle = new Bundle();
-                    bundle.putBoolean("isRecording", isRecording());
+                    bundle.putInt("recordingState", getRecordingState());
 //                        resultReceiver.send(Constants.MSG_ONFINISH_ASK_RECORDING_STATUS, bundle);
                     Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
                     intent.putExtra("resultCode", Constants.MSG_ONFINISH_ASK_RECORDING_STATUS);

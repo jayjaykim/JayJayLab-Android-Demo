@@ -403,16 +403,22 @@ public class ActivityMain extends ActivityBase {
                     if(resultData == null) {
                         // TODO what else should be done?
                     } else {
-                        if(resultData.getBoolean("isRecording")) {
-                            Ln.d("333");
-                            isPaused = false;
-                            textviewStatus.setText(R.string.recording);
-                            imagebuttonRecordPause.setImageResource(R.drawable.pause);
-                        } else {
-                            Ln.d("444");
-                            isPaused = true;
-                            textviewStatus.setText(R.string.paused);
-                            imagebuttonRecordPause.setImageResource(R.drawable.record);
+                        Ln.d("onReceiveResult() : recordingState : %d", resultData.getInt("recordingState"));
+                        switch(resultData.getInt("recordingState")) {
+                            case 0: // idle state
+                            case 3: // stopped state
+                                isPaused = false;
+                                break;
+                            case 1: // recording state
+                                isPaused = false;
+                                textviewStatus.setText(R.string.recording);
+                                imagebuttonRecordPause.setImageResource(R.drawable.pause);
+                                break;
+                            case 2: // paused state
+                                isPaused = true;
+                                textviewStatus.setText(R.string.paused);
+                                imagebuttonRecordPause.setImageResource(R.drawable.record);
+                                break;
                         }
                     }
                     enableButtons(true);
