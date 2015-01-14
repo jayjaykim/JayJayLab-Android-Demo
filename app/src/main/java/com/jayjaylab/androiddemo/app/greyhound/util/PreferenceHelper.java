@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 public class PreferenceHelper {
     public static final String KEY_GPX_FILE_PATH = "gpxfile_path";
     public static final String KEY_LOCATION_RECORDING_STATE = "location_recording_state";
+    public static final String KEY_LOCATION_RECORDING_STARTTIME = "location_recording_starttime";
 
     // Recording state
     public static final int RECORDING_STATE_IDLE = 0;
@@ -43,5 +44,19 @@ public class PreferenceHelper {
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(KEY_LOCATION_RECORDING_STATE, state);
         editor.commit();
+    }
+
+    @SuppressWarnings("unused")
+    public static void setLocationRecordingStartTime(Context context, String startTime) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(KEY_LOCATION_RECORDING_STARTTIME, startTime);
+        editor.commit();
+    }
+
+    @SuppressWarnings("unused")
+    public static String getLocationRecordingStarttime(Context context) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        return pref.getString(KEY_LOCATION_RECORDING_STARTTIME, null);
     }
 }

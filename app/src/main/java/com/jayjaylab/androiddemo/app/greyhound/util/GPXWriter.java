@@ -50,7 +50,7 @@ public class GPXWriter {
         try {
 //            currentFile = new RandomAccessFile(dirPath + File.separator + fileName, "rw");
             currentFile = new File(dirPath, fileName);
-            fileChannel = new FileOutputStream(currentFile).getChannel();
+            fileChannel = new FileOutputStream(currentFile, true).getChannel();
         } catch (Exception e) {
             Ln.e(e);
             NIOHelper.closeChannel(fileChannel);
@@ -59,9 +59,15 @@ public class GPXWriter {
         }
         Ln.d("openFile() : currentFile : %s", currentFile);
 
+        return true;
+    }
+
+    public boolean addHeader() {
+        if(currentFile == null)
+            return false;
 
         // adds header
-        if(!wrtieStringToFile(getHeader(fileName))) {
+        if(!wrtieStringToFile(getHeader(currentFile.getName()))) {
             return false;
         }
 
@@ -169,8 +175,8 @@ public class GPXWriter {
         StringBuilder builder = new StringBuilder();
         builder.append("\t\t\t<trkpt lat=\"" + location.getLatitude() + "\" lon=\"" +
                 location.getLongitude() + "\">\n");
-        builder.append("\t\t\t<ele>" + location.getAltitude() + "</ele>\n");
-        builder.append("\t\t\t<time>" + new DateTime(location.getTime()).toString() + "</time>\n");
+        builder.append("\t\t\t\t<ele>" + location.getAltitude() + "</ele>\n");
+        builder.append("\t\t\t\t<time>" + new DateTime(location.getTime()).toString() + "</time>\n");
         builder.append("\t\t\t</trkpt>\n");
 
         wrtieStringToFile(builder.toString());

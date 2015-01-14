@@ -87,6 +87,8 @@ public class ServiceRecordingPath extends RoboService implements
     public void onConnected(Bundle bundle) {
         Ln.d("onConnected() : bundle : %s", bundle);
         isLocationServiceConnected = true;
+
+        resumeRecordingIfStoppedUnexpectedly();
     }
 
     @Override
@@ -156,7 +158,6 @@ public class ServiceRecordingPath extends RoboService implements
         }
 
         checkPrecondition();
-        resumeRecordingIfStoppedUnexpectedly();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -208,8 +209,26 @@ public class ServiceRecordingPath extends RoboService implements
 
     protected void resumeRecordingIfStoppedUnexpectedly() {
         Ln.d("resumeRecordingIfStoppedUnexpectedly()");
-        // TODO if in recording or paused state, recover the previous state
-
+        // if in recording or paused state, recover the previous state
+        switch(PreferenceHelper.getLocationRecordingState(this)) {
+            case PreferenceHelper.RECORDING_STATE_RECORDING:
+                Ln.d("service was running but gets terminated unexpectedly");
+                currentPath = new Path();
+                currentPath.getPathEntity().setStartTime(PreferenceHelper.getLocationRecordingStarttime(this));
+                currentPath.getPathEntity().setGpxPath(PreferenceHelper.getGpxFilePath(this));
+                resumeRecording();
+                break;
+            case PreferenceHelper.RECORDING_STATE_PAUSED:
+                Ln.d("service was running but gets terminated unexpectedly");
+                // recovers the previous Path instance
+                currentPath = new Path();
+                currentPath.getPathEntity().setStartTime(PreferenceHelper.getLocationRecordingStarttime(this));
+                currentPath.getPathEntity().setGpxPath(PreferenceHelper.getGpxFilePath(this));
+                break;
+            default:
+                Ln.d("service was exited successfully before");
+                break;
+        }
     }
 
     protected void checkPrecondition() {
@@ -251,38 +270,79 @@ public class ServiceRecordingPath extends RoboService implements
         return dateFormat.format(date);
     }
 
-    protected void startRecording() {
-        Ln.d("startRecording()");
+    protected void resumeRecording() {
+        Ln.d("resumeRecording()");
 
 //        isRecording = true;
-        currentPath = new Path();
-        currentPath.getPathEntity().setStartTime(new DateTime().toString());
-        Ln.d("startRecording() : currentPath : %s", currentPath);
-        if(gpxWriter.isFileClosed()) {
-            boolean opened = gpxWriter.openFile(DIR_PATH, getFileName() + GPX_FILE_EXTENSION);
-            if(!opened) {
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("result", false);
-//                resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, bundle);
+        if(currentPath == null) {
+            currentPath = new Path();
+            currentPath.getPathEntity().setStartTime(new DateTime().toString());
+            Ln.d("resumeRecording() : currentPath : %s", currentPath);
+            if(gpxWriter.isFileClosed()) {
+                boolean opened = gpxWriter.openFile(DIR_PATH, getFileName() + GPX_FILE_EXTENSION);
+                if(!opened) {
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("result", false);
 
+                    currentPath = null;
+                    PreferenceHelper.setGpxFilePath(this, null);
+                    PreferenceHelper.setLocationRecordingState(this, PreferenceHelper.RECORDING_STATE_IDLE);
+                    PreferenceHelper.setLocationRecordingStartTime(this, null);
+
+                    Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+                    intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
+                    intent.putExtra("resultData", bundle);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    return;
+                }
+                gpxWriter.addHeader();
+            }
+            currentPath.getPathEntity().setGpxPath(gpxWriter.getAbsolutePath());
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    googleApiClient, locationRequest, ServiceRecordingPath.this);
+            PreferenceHelper.setGpxFilePath(this, gpxWriter.getAbsolutePath());
+            PreferenceHelper.setLocationRecordingState(this, PreferenceHelper.RECORDING_STATE_RECORDING);
+            PreferenceHelper.setLocationRecordingStartTime(this, currentPath.getPathEntity().getStartTime());
+//        resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, null);
+            Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+            intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        } else {
+            if(gpxWriter.isFileClosed()) {
+                File file = new File(currentPath.getPathEntity().getGpxPath());
+                Ln.d("resumeRecording() : parent : %s, name : %s", file.getParent(), file.getName());
+                boolean opened = gpxWriter.openFile(file.getParent(), file.getName());
+                if(!opened) {
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("result", false);
+
+                    currentPath = null;
+                    PreferenceHelper.setGpxFilePath(this, null);
+                    PreferenceHelper.setLocationRecordingState(this, PreferenceHelper.RECORDING_STATE_IDLE);
+                    PreferenceHelper.setLocationRecordingStartTime(this, null);
+
+                    Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+                    intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
+                    intent.putExtra("resultData", bundle);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    return;
+                }
+                LocationServices.FusedLocationApi.requestLocationUpdates(
+                        googleApiClient, locationRequest, ServiceRecordingPath.this);
                 Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
                 intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
-                intent.putExtra("resultData", bundle);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            } else {
+                Ln.d("resumeRecording() : resume the paused recording...");
+                LocationServices.FusedLocationApi.requestLocationUpdates(
+                        googleApiClient, locationRequest, ServiceRecordingPath.this);
 
-//                isRecording = false;
-                return;
+                PreferenceHelper.setLocationRecordingState(this, PreferenceHelper.RECORDING_STATE_RECORDING);
+                Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
+                intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
             }
         }
-        currentPath.getPathEntity().setGpxPath(gpxWriter.getAbsolutePath());
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                googleApiClient, locationRequest, ServiceRecordingPath.this);
-        PreferenceHelper.setGpxFilePath(this, gpxWriter.getAbsolutePath());
-        PreferenceHelper.setLocationRecordingState(this, PreferenceHelper.RECORDING_STATE_RECORDING);
-//        resultReceiver.send(Constants.MSG_ONFINISH_START_RECORDING, null);
-        Intent intent = new Intent(Constants.INTENT_FILTER_TAG);
-        intent.putExtra("resultCode", Constants.MSG_ONFINISH_START_RECORDING);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     protected void pauseRecording() {
@@ -302,6 +362,7 @@ public class ServiceRecordingPath extends RoboService implements
 
 //        isRecording = false;
         PreferenceHelper.setGpxFilePath(this, null);
+        PreferenceHelper.setLocationRecordingStartTime(this, null);
         PreferenceHelper.setLocationRecordingState(this, PreferenceHelper.RECORDING_STATE_STOPPED);
         if(currentPath != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, ServiceRecordingPath.this);
@@ -364,7 +425,7 @@ public class ServiceRecordingPath extends RoboService implements
             switch(msg.what) {
                 case Constants.MSG_START_RECORDING:
                     updateNotification(R.string.recording_path);
-                    startRecording();
+                    resumeRecording();
                     break;
                 case Constants.MSG_PAUSE_RECORDING:
                     // displays pause message

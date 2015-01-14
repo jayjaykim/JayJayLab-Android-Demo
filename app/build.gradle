@@ -11,7 +11,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 21
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.1"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
     }
     buildTypes {
