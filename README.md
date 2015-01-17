@@ -6,7 +6,7 @@ This simple Android app demonstrates how JayJayLab implements Java Android appli
 > - Secondly, use open source as many as possible.
 
 For the time being, there's only one sub application which is called "GreyHound" recording the current location in background.
-Our app is always based on some kinds of DI framework like RoboGuice, Dagger or something. The demo app is built on top of Roboguice.
+**Our app is always based on some kinds of DI framework like RoboGuice, Dagger or something. The demo app is built on top of Roboguice.**
 
 Introduction to each part of the application
 -----------
