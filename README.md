@@ -1,8 +1,7 @@
 JayJayLab-Android-Demo
 ======================
 
-This simple Android app demonstrates how JayJayLab implements Java Android application and what kinds of open sources we use
-for even simple function. Our philosophy of application, system development is 
+This simple Android app demonstrates how JayJayLab implements Java Android application and what kinds of open sources we use for even simple function. Our philosophy of application, system development is 
 first, use the latest and robust software technology to satisfy requirements
 Secondly, use open source as many as possible.
 
@@ -10,6 +9,7 @@ For the time being, there's only one sub application which is called "GreyHound"
 Our app is always based on some kinds of DI framework like RoboGuice, Dagger or something. The demo app is built on top of Roboguice.
 
 Introduction to each part of the application
+-----------------------------------
 
 Main Screen
 As you may know, demo app is made of latest Android support libraries such as Toolbar, RecyclerView, CardView and so on.
