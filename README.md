@@ -19,5 +19,5 @@ And every bitmap images are passed through Picasso library, thanks Square :). Ac
 #### GreyHound
 This sub application records locations in gpx file format and plot it on Google Map. Until the app isn't deleted, gpx files
 are stored historically and you can see a list of gpx files sorted by generated time. For time manipulation, Joda time is used
-by external libary which is now default in Java 8. And to manage Persistence GreenDAO is used to store gpx files and query on them.
+by external libary which is now default in Java 8. And to manage Persistence GreenDAO is used to CRUD gpx files.
 
