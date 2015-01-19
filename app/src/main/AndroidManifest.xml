@@ -70,13 +70,11 @@
         <!-- Debug Version API KEY -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBLabN5aluKoJ6AWKpQmNiElm_T-07iCNE"/>
+            android:value="AIzaSyBB6EiAr3NMVcmCSd9_qD-wKkei9ltN8ko"/>
         <!-- Release Version API KEY -->
-        <!--
-        <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCD2lsQ6Ioo1l4lnPb1ihUTcg01mDM4tU0"/>
-        -->
+        <!--<meta-data-->
+            <!--android:name="com.google.android.maps.v2.API_KEY"-->
+            <!--android:value="AIzaSyCD2lsQ6Ioo1l4lnPb1ihUTcg01mDM4tU0"/>-->
     </application>
 
 </manifest>

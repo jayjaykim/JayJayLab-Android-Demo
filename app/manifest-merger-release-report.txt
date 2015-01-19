@@ -154,11 +154,11 @@ MERGED from com.google.android.gms:play-services:6.5.87:21:9
 	android:value
 		ADDED from AndroidManifest.xml:69:13
 meta-data#com.google.android.maps.v2.API_KEY
-ADDED from AndroidManifest.xml:70:9
+ADDED from AndroidManifest.xml:75:9
 	android:name
-		ADDED from AndroidManifest.xml:71:13
+		ADDED from AndroidManifest.xml:76:13
 	android:value
-		ADDED from AndroidManifest.xml:72:13
+		ADDED from AndroidManifest.xml:77:13
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:support-v4:21.0.3:15:5
@@ -178,8 +178,6 @@ MERGED from com.android.support:support-v4:21.0.3:15:5
 	android:minSdkVersion
 		INJECTED from AndroidManifest.xml:0:0
 		INJECTED from AndroidManifest.xml:0:0
-android:uses-permission#android.permission.READ_EXTERNAL_STORAGE
-IMPLIED from AndroidManifest.xml:2:1 reason: requested WRITE_EXTERNAL_STORAGE
 activity#android.support.v7.widget.TestActivity
 ADDED from com.android.support:recyclerview-v7:21.0.3:18:9
 	android:label
