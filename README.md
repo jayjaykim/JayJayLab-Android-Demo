@@ -1,6 +1,6 @@
 JayJayLab-Android-Demo(Deprecated)
 ======================
-This simple application is built upon frameworks or libraries which are not adequate or up-to-dtate. Recently, I try to build every Android application on top of Dagger 2(DI framework), Realm for handling persistence, Guava(Utility and helper classes), Jodatime(time manipulation), Retrofit(Restfull api based networking), Picasso, Otto(event bus), Butterknife(view injection), Mockito, Robolectric, Expresso(testing). I will heavily depend on Google and Square artifacts.
+This simple application is built upon frameworks or libraries which are not adequate or up-to-date. Recently, I try to build every Android application on top of Dagger 2(DI framework), Realm for handling persistence, Guava(Utility and helper classes), Jodatime(time manipulation), Retrofit(Restfull api based networking), Picasso, Otto(event bus), Butterknife(view injection), Mockito, Robolectric, Expresso(testing). I will heavily depend on Google and Square artifacts.
 --------------
 
 This simple Android app demonstrates how JayJayLab implements Java Android application and what kinds of open sources we use for even simple function. Our philosophy of application, system development is
